@@ -1,0 +1,25 @@
+import { Injectable } from '@nestjs/common';
+import { License } from 'src/entity/knowledge/License';
+import { LicenseRepository } from 'src/codeclarity_modules/knowledge/LicenseRepository';
+
+@Injectable()
+export class LicenseService {
+    constructor(private readonly licenceRepo: LicenseRepository) {}
+
+    /**
+     * Get a license policy
+     * @param licenseId The id of the org
+     * @returns the license policy
+     */
+    async get(licenseId: string): Promise<License> {
+        return await this.licenceRepo.getLicenseData(licenseId);
+    }
+
+    /**
+     * Get a license policy
+     * @returns the license policy
+     */
+    async getAll(): Promise<Array<License>> {
+        return await this.licenceRepo.getAllLicenseData();
+    }
+}

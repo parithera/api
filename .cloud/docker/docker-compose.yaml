@@ -1,0 +1,37 @@
+services:
+    api:
+        build:
+            context: ../../api
+            dockerfile: .cloud/docker/Dockerfile
+            target: api-dev
+        image: ceherzog/api-dev:latest
+        restart: always
+        command: yarn run start:debug
+        env_file:
+            - ../../.cloud/env/.env.dev
+        volumes:
+            - ../../api:/app
+            - ../../.cloud/env:/app/env
+            - ../../private:/private
+        ports:
+            - 9229:9229
+            - 3000:3000
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+            db:
+                condition: service_started
+            pg_bouncer:
+                condition: service_started
+            adminer:
+                condition: service_started
+        deploy:
+            resources:
+                limits:
+                    cpus: '4'
+                    memory: 4G
+                reservations:
+                    cpus: '2'
+                    memory: 4G
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
