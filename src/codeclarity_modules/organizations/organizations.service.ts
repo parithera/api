@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { AuthenticatedUser } from 'src/types/auth/types';
-import { EntityNotFound } from 'src/types/errors/types';
+import { EntityNotFound, UserDoesNotExist } from 'src/types/errors/types';
 import { TypedPaginatedData } from 'src/types/paginated/types';
 import { PaginationUserSuppliedConf } from 'src/types/paginated/types';
 import { OrganizationsMemberService } from './organizationMember.service';
 import { SortDirection } from 'src/types/sort/types';
 import { TeamMember } from 'src/types/entities/frontend/TeamMember';
-import { MemberRole, OrgMembership } from 'src/types/entities/frontend/OrgMembership';
-import { Invitation, InviteCreateBody } from 'src/types/entities/frontend/OrgInvitation';
+import { MemberRole } from 'src/types/entities/frontend/OrgMembership';
+import { InviteCreateBody } from 'src/types/entities/frontend/OrgInvitation';
 import { OrganizationCreateBody } from 'src/types/entities/frontend/Org';
 import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
 import { Organization } from 'src/entity/codeclarity/Organization';
@@ -15,17 +15,26 @@ import { User } from 'src/entity/codeclarity/User';
 import { Email, EmailType } from 'src/entity/codeclarity/Email';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Invitation } from 'src/entity/codeclarity/Invitation';
+import { genRandomString } from 'src/utils/crypto';
+import { hash } from 'src/utils/crypto';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class OrganizationsService {
     constructor(
+        private readonly emailService: EmailService,
         private readonly organizationMemberService: OrganizationsMemberService,
         @InjectRepository(OrganizationMemberships, 'codeclarity')
         private membershipRepository: Repository<OrganizationMemberships>,
         @InjectRepository(Organization, 'codeclarity')
         private organizationRepository: Repository<Organization>,
         @InjectRepository(User, 'codeclarity')
-        private userRepository: Repository<User>
+        private userRepository: Repository<User>,
+        @InjectRepository(Invitation, 'codeclarity')
+        private invitationRepository: Repository<Invitation>,
+        @InjectRepository(Email, 'codeclarity')
+        private emailRepository: Repository<Email>
     ) {}
 
     /**
@@ -225,12 +234,13 @@ export class OrganizationsService {
     }
 
     /**
-     * Invite a user or non-user to an organization
+     * Invite a user to an organization
      * @throws {NotAuthorized}
      * @throws {EntityNotFound}
      * @throws {PersonalOrgCannotBeModified}
      * @throws {InvitationOrgAlreadyExists}
      * @throws {AlreadyExists}
+     * @throws {UserDoesNotExist}
      * @throws {InternalError}
      *
      * @param orgId The organization id
@@ -242,7 +252,55 @@ export class OrganizationsService {
         inviteBody: InviteCreateBody,
         user: AuthenticatedUser
     ): Promise<void> {
-        throw new Error('Method not implemented.');
+        await this.organizationMemberService.hasRequiredRole(orgId, user.userId, MemberRole.OWNER);
+
+        const invitedUser = await this.userRepository.findOneBy({
+            email: inviteBody.user_email
+        });
+
+        if (!invitedUser) {
+            throw new UserDoesNotExist();
+        }
+
+        const inviter = await this.userRepository.findOneByOrFail({
+            id: user.userId
+        });
+
+        const org = await this.organizationRepository.findOneByOrFail({
+            id: orgId
+        });
+
+        const invitation: Invitation = new Invitation();
+        invitation.created_on = new Date();
+        invitation.role = inviteBody.role;
+        invitation.user = invitedUser;
+        invitation.organization = org;
+        invitation.ttl = new Date(new Date().getTime() + 30 * 60000);
+        await this.invitationRepository.save(invitation);
+
+        const activationToken = await genRandomString(64);
+        const activationTokenhash = await hash(activationToken, {});
+        const userIdHash = await hash(invitedUser.id, {});
+
+        const mail = new Email();
+        mail.email_type = EmailType.ORGANIZATION_INVITE;
+        mail.token_digest = activationTokenhash;
+        mail.user_id_digest = userIdHash;
+        mail.ttl = new Date(new Date().getTime() + 30 * 60000); // Expires after 30 mins
+        mail.user = invitedUser;
+
+        await this.emailRepository.save(mail);
+
+        await this.emailService.sendOrganizationInvite({
+            email: invitedUser.email,
+            inviteToken: activationTokenhash,
+            blockOrgInvitesToken: '',
+            blockAllOrgInvitesToken: '',
+            userEmailDigest: userIdHash,
+            organizationName: org.name,
+            inviter: inviter,
+            orgId: org.id
+        });
     }
 
     /**
@@ -308,7 +366,12 @@ export class OrganizationsService {
         //     }
         // });
 
-        const invitations = new Array<Invitation>();
+        const invitations = await this.invitationRepository.find({
+            where: {
+                organization: { id: orgId },
+                user: { id: user.userId }
+            }
+        });
 
         // for (const org of organizations) {
         //     const invitation = new Invitation();

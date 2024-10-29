@@ -8,12 +8,23 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Organization } from 'src/entity/codeclarity/Organization';
 import { User } from 'src/entity/codeclarity/User';
 import { Log } from 'src/entity/codeclarity/Log';
+import { Invitation } from 'src/entity/codeclarity/Invitation';
+import { Email } from 'src/entity/codeclarity/Email';
+import { EmailService } from '../email/email.service';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([OrganizationMemberships, Organization, User, Log], 'codeclarity')
+        TypeOrmModule.forFeature(
+            [OrganizationMemberships, Organization, User, Log, Invitation, Email],
+            'codeclarity'
+        )
     ],
-    providers: [OrganizationsService, OrganizationsMemberService, OrganizationLoggerService],
+    providers: [
+        OrganizationsService,
+        OrganizationsMemberService,
+        OrganizationLoggerService,
+        EmailService
+    ],
     controllers: [OrganizationsController]
 })
 export class OrganizationsModule {}

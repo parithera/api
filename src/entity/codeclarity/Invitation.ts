@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Relation } from 'typeorm';
 import { Organization } from './Organization';
 import { User } from './User';
 import { ApiProperty } from '@nestjs/swagger';
@@ -31,21 +31,21 @@ export class Invitation {
 
     @ApiProperty()
     @Expose()
-    @OneToMany(
+    @ManyToOne(
         () => Organization,
         (organization) => {
             organization.invitations;
         }
     )
-    organization: string;
+    organization: Relation<Organization>;
 
     @ApiProperty()
     @Expose()
-    @OneToMany(
+    @ManyToOne(
         () => User,
         (user) => {
             user.invitations;
         }
     )
-    user: string;
+    user: Relation<User>;
 }

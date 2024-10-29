@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailerService } from '@nestjs-modules/mailer';
-import { User } from 'src/types/entities/frontend/User';
+import { User } from 'src/entity/codeclarity/User';
 
 @Injectable()
 export class EmailService {
@@ -125,7 +125,7 @@ export class EmailService {
             template: './organization_invite',
             templateData: {
                 inviter_last_name: inviter.last_name,
-                inviter_first_name: inviter.last_name,
+                inviter_first_name: inviter.first_name,
                 organization_name: organizationName,
                 organization_invite_url: url,
                 organization_block_invites_url: orgInvitesBlockurl,

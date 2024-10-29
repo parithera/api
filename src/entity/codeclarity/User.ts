@@ -125,7 +125,7 @@ export class User {
     @OneToMany(() => Analyzer, (analyzer) => analyzer.created_by)
     analyzers_created: Relation<Analyzer[]>;
 
-    @ManyToMany(() => Invitation, (invitation) => invitation.user)
+    @OneToMany(() => Invitation, (invitation) => invitation.user)
     invitations: Relation<Invitation[]>;
 
     @OneToMany(() => OrganizationMemberships, (membership) => membership.organization)

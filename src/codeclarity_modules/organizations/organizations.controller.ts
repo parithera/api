@@ -33,7 +33,8 @@ import {
     NotAMember,
     NotAuthenticated,
     NotAuthorized,
-    PersonalOrgCannotBeModified
+    PersonalOrgCannotBeModified,
+    UserDoesNotExist
 } from 'src/types/errors/types';
 import { APIDocTypedResponseDecorator } from 'src/decorators/TypedResponse';
 import { APIDocNoDataResponseDecorator } from 'src/decorators/NoDataResponse';
@@ -45,11 +46,11 @@ import {
     OrganizationMetaData
 } from 'src/types/entities/frontend/Org';
 import { TeamMember } from 'src/types/entities/frontend/TeamMember';
-import { Invitation, InviteCreateBody } from 'src/types/entities/frontend/OrgInvitation';
+import { InviteCreateBody } from 'src/types/entities/frontend/OrgInvitation';
 import { OrganizationAuditLog } from 'src/types/entities/frontend/OrgAuditLog';
 import { Organization } from 'src/entity/codeclarity/Organization';
-import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
 import { Log } from 'src/entity/codeclarity/Log';
+import { Invitation } from 'src/entity/codeclarity/Invitation';
 
 @Controller('org')
 export class OrganizationsController {
@@ -221,6 +222,7 @@ export class OrganizationsController {
             PersonalOrgCannotBeModified,
             EntityNotFound,
             AlreadyExists,
+            UserDoesNotExist,
             InvitationOrgAlreadyExists
         ]
     })
