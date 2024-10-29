@@ -3,7 +3,12 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": [{ "include": "modules/email/templates/**/*", "outDir": "dist/src" }],
+    "assets": [
+      {
+        "include": "codeclarity_modules/email/templates/**/*",
+        "outDir": "dist/src"
+      }
+    ],
     "deleteOutDir": true
   }
 }
