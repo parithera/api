@@ -59,6 +59,7 @@ export class FileController {
     async uploadFile(
         @AuthUser() user: AuthenticatedUser,
         @Param('project_id') project_id: string,
+        @Param('organization_id') organization_id: string,
         @Body() queryParams: UploadData,
         @UploadedFile() file: File
     ): Promise<void> {
@@ -67,7 +68,7 @@ export class FileController {
             throw new InternalError('500', 'No file provided');
         }
 
-        this.fileService.uploadFile(user, file, project_id, queryParams);
+        this.fileService.uploadFile(user, file, project_id, organization_id, queryParams);
         return;
     }
 
@@ -75,9 +76,10 @@ export class FileController {
     async delete(
         @AuthUser() user: AuthenticatedUser,
         @Param('project_id') project_id: string,
+        @Param('organization_id') organization_id: string,
         @Param('file_id') file_id: string
     ): Promise<NoDataResponse> {
-        await this.fileService.delete(file_id, project_id, user);
+        await this.fileService.delete(file_id, organization_id, project_id, user);
         return {};
     }
 

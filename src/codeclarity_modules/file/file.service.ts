@@ -10,10 +10,13 @@ import { join } from 'path';
 import { escapeString } from 'src/utils/cleaner';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { MemberRole } from 'src/entity/codeclarity/OrganizationMemberships';
+import { OrganizationsMemberService } from '../organizations/organizationMember.service';
 
 @Injectable()
 export class FileService {
     constructor(
+        private readonly organizationMemberService: OrganizationsMemberService,
         @InjectRepository(Project, 'codeclarity')
         private projectRepository: Repository<Project>,
         @InjectRepository(User, 'codeclarity')
@@ -26,8 +29,29 @@ export class FileService {
         user: AuthenticatedUser,
         file: File,
         project_id: string,
+        organization_id: string,
         queryParams: UploadData
     ): Promise<void> {
+        await this.organizationMemberService.hasRequiredRole(
+            organization_id,
+            user.userId,
+            MemberRole.USER
+        );
+        // retrieve files from project
+        const project = await this.projectRepository.findOne({
+            where: {
+                id: project_id,
+                organizations: {
+                    id: organization_id
+                }
+            },
+            relations: {
+                added_by: true
+            }
+        });
+        if (!project) {
+            throw new Error('Project not found');
+        }
         const escapeProjectId = escapeString(project_id);
 
         // Retrieve the user who added the file
@@ -41,7 +65,7 @@ export class FileService {
         }
 
         // Write the file to the file system
-        const folderPath = join('/private', user.userId, escapeProjectId);
+        const folderPath = join('/private', project.added_by.id, escapeProjectId);
         if (!fs.existsSync(folderPath)) {
             fs.mkdirSync(folderPath, { recursive: true });
         }
@@ -52,16 +76,6 @@ export class FileService {
 
         fileStream.write(file.buffer);
         fileStream.end();
-
-        // Retrieve project
-        const project = await this.projectRepository.findOne({
-            where: {
-                id: project_id
-            }
-        });
-        if (!project) {
-            throw new Error('Project not found');
-        }
 
         // Save the file to the database
         const file_entity = new FileEntity();
@@ -74,7 +88,33 @@ export class FileService {
         this.fileRepository.save(file_entity);
     }
 
-    async delete(file_id: string, project_id: string, user: AuthenticatedUser): Promise<void> {
+    async delete(
+        file_id: string,
+        organization_id: string,
+        project_id: string,
+        user: AuthenticatedUser
+    ): Promise<void> {
+        await this.organizationMemberService.hasRequiredRole(
+            organization_id,
+            user.userId,
+            MemberRole.USER
+        );
+        // retrieve files from project
+        const project = await this.projectRepository.findOne({
+            where: {
+                id: project_id,
+                organizations: {
+                    id: organization_id
+                }
+            },
+            relations: {
+                added_by: true
+            }
+        });
+        if (!project) {
+            throw new Error('Project not found');
+        }
+
         const escapeProjectId = escapeString(project_id);
         // Retrieve the user who added the file
         const added_by = await this.userRepository.findOne({
@@ -97,18 +137,8 @@ export class FileService {
             throw new Error('File not found');
         }
 
-        // Retrieve project
-        const project = await this.projectRepository.findOne({
-            where: {
-                id: project_id
-            }
-        });
-        if (!project) {
-            throw new Error('Project not found');
-        }
-
         // Delete the file from the file system
-        const filePath = join('/private', user.userId, escapeProjectId, file.name);
+        const filePath = join('/private', project.added_by.id, escapeProjectId, file.name);
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
