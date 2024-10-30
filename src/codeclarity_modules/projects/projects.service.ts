@@ -240,7 +240,8 @@ export class ProjectService {
                 id: id
             },
             relations: {
-                files: true
+                files: true,
+                added_by: true
             }
         });
 

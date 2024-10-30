@@ -8,7 +8,10 @@ import { SortDirection } from 'src/types/sort/types';
 import { TeamMember } from 'src/types/entities/frontend/TeamMember';
 import { MemberRole } from 'src/types/entities/frontend/OrgMembership';
 import { InviteCreateBody } from 'src/types/entities/frontend/OrgInvitation';
-import { OrganizationCreateBody } from 'src/types/entities/frontend/Org';
+import {
+    OrganizationCreateBody,
+    OrganizationInfoForInvitee
+} from 'src/types/entities/frontend/Org';
 import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
 import { Organization } from 'src/entity/codeclarity/Organization';
 import { User } from 'src/entity/codeclarity/User';
@@ -270,22 +273,24 @@ export class OrganizationsService {
             id: orgId
         });
 
+        const activationToken = await genRandomString(64);
+        const activationTokenhash = await hash(activationToken, {});
+        const userEmailHash = await hash(invitedUser.email, {});
+
         const invitation: Invitation = new Invitation();
         invitation.created_on = new Date();
         invitation.role = inviteBody.role;
+        invitation.token_digest = activationTokenhash;
+        invitation.user_email_digest = userEmailHash;
         invitation.user = invitedUser;
         invitation.organization = org;
         invitation.ttl = new Date(new Date().getTime() + 30 * 60000);
         await this.invitationRepository.save(invitation);
 
-        const activationToken = await genRandomString(64);
-        const activationTokenhash = await hash(activationToken, {});
-        const userIdHash = await hash(invitedUser.id, {});
-
         const mail = new Email();
         mail.email_type = EmailType.ORGANIZATION_INVITE;
         mail.token_digest = activationTokenhash;
-        mail.user_id_digest = userIdHash;
+        mail.user_id_digest = userEmailHash;
         mail.ttl = new Date(new Date().getTime() + 30 * 60000); // Expires after 30 mins
         mail.user = invitedUser;
 
@@ -296,7 +301,7 @@ export class OrganizationsService {
             inviteToken: activationTokenhash,
             blockOrgInvitesToken: '',
             blockAllOrgInvitesToken: '',
-            userEmailDigest: userIdHash,
+            userEmailDigest: userEmailHash,
             organizationName: org.name,
             inviter: inviter,
             orgId: org.id
@@ -405,7 +410,93 @@ export class OrganizationsService {
         emailDigest: string,
         user: AuthenticatedUser
     ): Promise<void> {
-        throw new Error('Method not implemented.');
+        const invitation = await this.invitationRepository.findOne({
+            where: {
+                token_digest: inviteToken,
+                user_email_digest: emailDigest
+            },
+            relations: {
+                organization: {
+                    organizationMemberships: true,
+                    created_by: true
+                },
+                user: true
+            }
+        });
+        if (!invitation) {
+            throw new EntityNotFound();
+        }
+
+        const membership = new OrganizationMemberships();
+        membership.joined_on = new Date();
+        membership.organization = invitation.organization;
+        membership.role = invitation.role;
+        membership.user = invitation.user;
+
+        await this.membershipRepository.save(membership);
+        await this.invitationRepository.delete(invitation);
+
+        const mail = await this.emailRepository.findOneOrFail({
+            where: {
+                token_digest: inviteToken,
+                user_id_digest: emailDigest
+            }
+        });
+        await this.emailRepository.delete(mail);
+    }
+
+    /**
+     * Join an organization via an invitation
+     * @throws {InvitationInvalidOrExpired}
+     * @throws {InternalError}
+     *
+     * @param inviteToken The invitation token
+     * @param emailDigest The user's email digest
+     * @param user The authenticated user
+     */
+    async getInviteeInfo(
+        inviteToken: string,
+        emailDigest: string,
+        user: AuthenticatedUser
+    ): Promise<OrganizationInfoForInvitee> {
+        const invitee = await this.userRepository.findOne({
+            where: { id: user.userId }
+        });
+        if (!invitee) {
+            throw new EntityNotFound();
+        }
+
+        const info = new OrganizationInfoForInvitee();
+        const invitation = await this.invitationRepository.findOne({
+            where: {
+                token_digest: inviteToken,
+                user_email_digest: emailDigest,
+                user: invitee
+            },
+            relations: {
+                organization: {
+                    organizationMemberships: true,
+                    created_by: true
+                },
+                user: true
+            }
+        });
+        if (!invitation) {
+            throw new EntityNotFound();
+        }
+
+        info.id = invitation.id;
+        info.name = invitation.organization.name;
+        info.description = invitation.organization.description;
+        info.color_scheme = invitation.organization.color_scheme;
+        info.created_by = invitation.organization.created_by;
+        info.created_on = invitation.organization.created_on;
+        info.number_of_members = invitation.organization.organizationMemberships.length;
+        info.invite_created_by = invitation.organization.created_by; // TODO Change this line
+        info.invite_created_on = invitation.created_on;
+        info.role = invitation.role;
+
+        return info;
     }
 
     /**
@@ -452,7 +543,17 @@ export class OrganizationsService {
      * @param user The authenticated user
      */
     async deleteOrg(orgId: string, user: AuthenticatedUser): Promise<void> {
-        throw new Error('Method not implemented.');
+        await this.organizationMemberService.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+
+        const memberships = await this.membershipRepository.find({
+            where: {
+                organization: {
+                    id: orgId
+                }
+            }
+        });
+        await this.membershipRepository.remove(memberships);
+        await this.organizationRepository.delete({ id: orgId });
     }
 
     /**

@@ -59,7 +59,7 @@ export class Organization {
 
     // Foreign keys
     @ManyToOne(() => User, (user) => user.organizations_created)
-    created_by?: Relation<User>;
+    created_by: Relation<User>;
 
     @OneToMany(() => Invitation, (invitation) => invitation.organization)
     invitations?: Relation<Invitation[]>;

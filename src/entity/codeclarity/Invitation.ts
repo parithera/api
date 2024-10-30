@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Relation } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from 'typeorm';
 import { Organization } from './Organization';
 import { User } from './User';
 import { ApiProperty } from '@nestjs/swagger';
@@ -22,6 +22,16 @@ export class Invitation {
     @Expose()
     @Column()
     role: MemberRole;
+
+    @Column({
+        length: 250
+    })
+    token_digest: string;
+
+    @Column({
+        length: 250
+    })
+    user_email_digest: string;
 
     @ApiProperty()
     @Column('timestamptz', { nullable: true })
