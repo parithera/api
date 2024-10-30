@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { OptionalTransform } from 'src/transformers/transformer';
 import { TeamMember } from './TeamMember';
 import { MemberRole } from './OrgMembership';
+import { User } from 'src/entity/codeclarity/User';
 
 /********************************************/
 /*             Database entities            */
@@ -26,24 +27,34 @@ export class OrganizationMetaData {
 
 export class OrganizationInfoForInvitee {
     @ApiProperty()
+    @Expose()
     id: string;
     @ApiProperty()
+    @Expose()
     name: string;
     @ApiProperty()
+    @Expose()
     description: string;
     @ApiProperty()
+    @Expose()
     color_scheme: string;
     @ApiProperty()
+    @Expose()
     created_on: Date;
+    @ApiProperty({ required: false })
+    @Expose()
+    created_by?: Partial<User>;
+    @ApiProperty({ required: false })
+    @Expose()
+    invite_created_by?: Partial<User>;
     @ApiProperty()
-    created_by?: TeamMember;
-    @ApiProperty()
-    invite_created_by?: TeamMember;
-    @ApiProperty()
+    @Expose()
     invite_created_on: Date;
     @ApiProperty()
+    @Expose()
     role: MemberRole;
     @ApiProperty()
+    @Expose()
     number_of_members: number;
 }
 

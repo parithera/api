@@ -45,10 +45,14 @@ import {
 import { IntegrationType, IntegrationProvider } from 'src/types/entities/frontend/Integration';
 import { User } from 'src/entity/codeclarity/User';
 import { Organization } from 'src/entity/codeclarity/Organization';
-import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
+import {
+    MemberRole,
+    OrganizationMemberships
+} from 'src/entity/codeclarity/OrganizationMemberships';
 import { Email, EmailType } from 'src/entity/codeclarity/Email';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { OrganizationsMemberService } from '../organizations/organizationMember.service';
 
 /**
  * This service offers methods for working with users
@@ -56,6 +60,7 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class UsersService {
     constructor(
+        private readonly organizationMemberService: OrganizationsMemberService,
         private readonly emailService: EmailService,
         private readonly gitlabIntegrationTokenService: GitlabIntegrationTokenService,
         @InjectRepository(User, 'codeclarity')
@@ -109,9 +114,11 @@ export class UsersService {
         orgId: string,
         authenticatedUser: AuthenticatedUser
     ): Promise<void> {
-        if (authenticatedUser.userId != userId) {
-            throw new NotAuthorized();
-        }
+        await this.organizationMemberService.hasRequiredRole(
+            orgId,
+            authenticatedUser.userId,
+            MemberRole.USER
+        );
 
         const user = await this.userRepository.findOne({
             where: {
@@ -135,9 +142,9 @@ export class UsersService {
             throw new EntityNotFound();
         }
 
-        if (user.id != organization.created_by?.id) {
-            throw new NotAuthorized('The user is not the owner of the organization');
-        }
+        // if (user.id != organization.created_by?.id) {
+        //     throw new NotAuthorized('The user is not the owner of the organization');
+        // }
 
         organization.default.push(user);
 

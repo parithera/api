@@ -9,6 +9,7 @@ import { Organization } from 'src/entity/codeclarity/Organization';
 import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
 import { AuthModule } from '../auth/auth.module';
 import { EmailModule } from '../email/email.module';
+import { OrganizationsMemberService } from '../organizations/organizationMember.service';
 
 @Module({
     imports: [
@@ -19,7 +20,7 @@ import { EmailModule } from '../email/email.module';
         AuthModule,
         EmailModule
     ],
-    providers: [UsersService, GitlabIntegrationTokenService],
+    providers: [UsersService, GitlabIntegrationTokenService, OrganizationsMemberService],
     controllers: [UsersController]
 })
 export class UsersModule {}

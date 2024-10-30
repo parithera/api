@@ -59,10 +59,9 @@ export class Organization {
 
     // Foreign keys
     @ManyToOne(() => User, (user) => user.organizations_created)
-    created_by?: Relation<User>;
+    created_by: Relation<User>;
 
-    @ManyToMany(() => Invitation, (invitation) => invitation.organization)
-    @JoinTable()
+    @OneToMany(() => Invitation, (invitation) => invitation.organization)
     invitations?: Relation<Invitation[]>;
 
     @OneToMany(() => OrganizationMemberships, (membership) => membership.organization)

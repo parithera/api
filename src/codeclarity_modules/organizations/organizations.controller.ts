@@ -33,7 +33,8 @@ import {
     NotAMember,
     NotAuthenticated,
     NotAuthorized,
-    PersonalOrgCannotBeModified
+    PersonalOrgCannotBeModified,
+    UserDoesNotExist
 } from 'src/types/errors/types';
 import { APIDocTypedResponseDecorator } from 'src/decorators/TypedResponse';
 import { APIDocNoDataResponseDecorator } from 'src/decorators/NoDataResponse';
@@ -42,14 +43,15 @@ import { APIDocTypedPaginatedResponseDecorator } from 'src/decorators/TypedPagin
 import {
     JoinOrgCreateBody,
     OrganizationCreateBody,
+    OrganizationInfoForInvitee,
     OrganizationMetaData
 } from 'src/types/entities/frontend/Org';
 import { TeamMember } from 'src/types/entities/frontend/TeamMember';
-import { Invitation, InviteCreateBody } from 'src/types/entities/frontend/OrgInvitation';
+import { InviteCreateBody } from 'src/types/entities/frontend/OrgInvitation';
 import { OrganizationAuditLog } from 'src/types/entities/frontend/OrgAuditLog';
 import { Organization } from 'src/entity/codeclarity/Organization';
-import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
 import { Log } from 'src/entity/codeclarity/Log';
+import { Invitation } from 'src/entity/codeclarity/Invitation';
 
 @Controller('org')
 export class OrganizationsController {
@@ -221,6 +223,7 @@ export class OrganizationsController {
             PersonalOrgCannotBeModified,
             EntityNotFound,
             AlreadyExists,
+            UserDoesNotExist,
             InvitationOrgAlreadyExists
         ]
     })
@@ -248,6 +251,24 @@ export class OrganizationsController {
     ): Promise<NoDataResponse> {
         await this.organizationsService.joinOrg(joinOrgBody.token, joinOrgBody.email_digest, user);
         return {};
+    }
+
+    @ApiTags('Organizations')
+    @APIDocNoDataResponseDecorator()
+    @ApiErrorDecorator({ statusCode: 401, errors: [NotAuthenticated] })
+    @ApiErrorDecorator({ statusCode: 400, errors: [InvitationInvalidOrExpired] })
+    @ApiErrorDecorator({ statusCode: 500, errors: [InternalError] })
+    @Get(':organization_id/org_info_invitee')
+    async inviteeInfo(
+        @AuthUser() user: AuthenticatedUser,
+        @Query('token') token: string,
+        @Query('user_email_hash') user_email_hash: string
+    ): Promise<TypedResponse<OrganizationInfoForInvitee>> {
+        const info = await this.organizationsService.getInviteeInfo(token, user_email_hash, user);
+
+        return {
+            data: info
+        };
     }
 
     @ApiTags('Organizations')
