@@ -295,7 +295,8 @@ export class ProjectService {
             .leftJoinAndSelect('project.analyses', 'analyses')
             .orderBy('analyses.created_on', 'DESC')
             .leftJoinAndSelect('analyses.analyzer', 'analyzer')
-            .leftJoinAndSelect('project.files', 'files');
+            .leftJoinAndSelect('project.files', 'files')
+            .leftJoinAndSelect('project.added_by', 'added_by');
 
         if (sortBy) {
             if (sortBy == AllowedOrderByGetProjects.NAME)
