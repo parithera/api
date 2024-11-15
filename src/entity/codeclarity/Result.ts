@@ -23,7 +23,7 @@ export interface ResultByAnalysisId {
 }
 
 export interface ResultObject {
-    result: JSON;
+    result: object;
     analysis_info: any;
 }
 
