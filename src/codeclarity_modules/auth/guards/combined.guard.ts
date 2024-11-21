@@ -7,7 +7,8 @@ import { NotAuthenticated, AccountNotActivated } from 'src/types/errors/types';
 import { Algorithm } from 'jsonwebtoken';
 import { JWTPayload } from 'src/types/jwt/types';
 import { Request } from 'express';
-import { ApiKeysService } from 'src/codeclarity_modules/apiKeys/apiKeys.service';
+import { Socket } from 'socket.io';
+// import { ApiKeysService } from 'src/codeclarity_modules/apiKeys/apiKeys.service';
 const fs = require('fs');
 
 /**
@@ -20,8 +21,8 @@ export class CombinedAuthGuard implements CanActivate {
 
     constructor(
         private jwtService: JwtService,
-        private reflector: Reflector,
-        private apiKeyService: ApiKeysService
+        private reflector: Reflector
+        // private apiKeyService: ApiKeysService
     ) {
         this.privateKey = fs.readFileSync('./jwt/private.pem', 'utf8');
         this.algorithms = ['ES512'];
@@ -37,10 +38,23 @@ export class CombinedAuthGuard implements CanActivate {
             return true;
         }
 
-        // If the endpoint requires authentication, check jwt and api tokens
-        const request: Request = context.switchToHttp().getRequest();
-        const jwtToken = this.extractJWTTokenFromHeader(request);
-        const apiToken = this.extractAPITokenFromHeader(request);
+        let authHeader: string | undefined = undefined;
+        let apiHeader: string | string[] | undefined = undefined;
+        let request: Request | undefined = undefined;
+        let socket: Socket | undefined = undefined;
+        if (context.getType() == 'ws') {
+            // console.log(context.switchToWs().getClient());
+            socket = context.switchToWs().getClient() as Socket;
+            authHeader = socket.handshake.headers.authorization;
+        } else {
+            // If the endpoint requires authentication, check jwt and api tokens
+            request = context.switchToHttp().getRequest() as Request;
+            authHeader = request.headers.authorization;
+            apiHeader = request.headers['x-api-key'] ?? request.headers['X-API-KEY'];
+        }
+
+        const jwtToken = this.extractJWTTokenFromHeader(authHeader);
+        const apiToken = this.extractAPITokenFromHeader(apiHeader);
 
         // If neither api token nor jwt token are given, the user is not authenticated
         if (!jwtToken && !apiToken) {
@@ -52,7 +66,11 @@ export class CombinedAuthGuard implements CanActivate {
             const [jwtTokenValid, userJWT] = await this.verifyJWTToken(jwtToken);
             if (!userJWT?.activated) throw new AccountNotActivated();
             if (jwtTokenValid) {
-                request['user'] = userJWT;
+                if (request) {
+                    request['user'] = userJWT;
+                } else if (socket) {
+                    socket.data['user'] = userJWT;
+                }
                 return true;
             }
         }
@@ -81,8 +99,7 @@ export class CombinedAuthGuard implements CanActivate {
      * @param request Request object
      * @returns {Promise<string | undefined>} the bearer token, if present, otherwise undefined.
      */
-    private extractJWTTokenFromHeader(request: Request): string | undefined {
-        const authHeader = request.headers.authorization;
+    private extractJWTTokenFromHeader(authHeader: string | undefined): string | undefined {
         if (authHeader) {
             const [type, token] = authHeader.split(' ') ?? [];
             if (type === 'Bearer') {
@@ -97,8 +114,9 @@ export class CombinedAuthGuard implements CanActivate {
      * @param request Request object
      * @returns {Promise<[string | undefined]>} the api token, if present, otherwise undefined.
      */
-    private extractAPITokenFromHeader(request: Request): string | undefined {
-        const apiHeader = request.headers['x-api-key'] ?? request.headers['X-API-KEY'];
+    private extractAPITokenFromHeader(
+        apiHeader: string | string[] | undefined
+    ): string | undefined {
         if (apiHeader && typeof apiHeader == 'string') {
             return apiHeader;
         }
