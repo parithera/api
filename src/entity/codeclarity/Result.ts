@@ -7,7 +7,7 @@ export class Result {
     id: string;
 
     @Column('jsonb')
-    result: JSON;
+    result: ResultObject;
 
     // Foreign keys
     @ManyToOne(() => Analysis, (analysis) => analysis.results)
@@ -20,4 +20,16 @@ export class Result {
 export interface ResultByAnalysisId {
     id: string;
     image: string;
+}
+
+export interface ResultObject {
+    result: object;
+    analysis_info: any;
+}
+
+export interface AnalysisInfo {
+    extra: any;
+    errors: Array<any>;
+    status: string;
+    time: any;
 }
