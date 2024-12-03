@@ -19,6 +19,9 @@ export class Analyzer {
     @Expose()
     name: string;
 
+    @Column()
+    global: boolean;
+
     @Column('text')
     @ApiProperty()
     @Expose()

@@ -51,6 +51,7 @@ export class AnalyzersService {
         analyzer.name = analyzerData.name;
         analyzer.description = analyzerData.description;
         analyzer.steps = analyzerData.steps;
+        analyzer.global = false;
         analyzer.organization = organization;
 
         const created_analyzer = await this.analyzerRepository.save(analyzer);
@@ -119,6 +120,7 @@ export class AnalyzersService {
             .leftJoinAndSelect('analyzer.organization', 'organization')
             .where('organization.id = :orgId', { orgId })
             .andWhere('analyzer.name = :name', { name })
+            .orWhere('analyzer.global = true')
             .getOne();
 
         if (!analyzer) {
@@ -162,7 +164,8 @@ export class AnalyzersService {
         const analyzersQueryBuilder = this.analyzerRepository
             .createQueryBuilder('analyzer')
             .leftJoinAndSelect('analyzer.organization', 'organization')
-            .where('organization.id = :orgId', { orgId });
+            .where('organization.id = :orgId', { orgId })
+            .orWhere('analyzer.global = true');
 
         const fullCount = await analyzersQueryBuilder.getCount();
 
@@ -207,7 +210,20 @@ export class AnalyzersService {
      * @returns whether or not the analyzer belongs to the org
      */
     private async doesAnalyzerBelongToOrg(analyzerId: string, orgId: string): Promise<boolean> {
-        const analyzer = await this.analyzerRepository.findOne({
+        // Check if analyzer is global
+        let analyzer = await this.analyzerRepository.findOne({
+            where: {
+                global: true,
+                id: analyzerId
+            }
+        });
+
+        if (analyzer) {
+            return true;
+        }
+
+        // Else check if it belongs to organization
+        analyzer = await this.analyzerRepository.findOne({
             relations: {
                 organization: true
             },
