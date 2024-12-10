@@ -71,21 +71,24 @@ export class FileService {
         }
 
         const escapedFileName = escapeString(queryParams.file_name);
+
         const filePath = join(folderPath, escapedFileName); // Replace with the desired file path
-        const fileStream = fs.createWriteStream(filePath);
+        const fileStream = fs.createWriteStream(filePath, {flags: "a+"});
 
         fileStream.write(file.buffer);
         fileStream.end();
 
-        // Save the file to the database
-        const file_entity = new FileEntity();
-        file_entity.added_by = added_by;
-        file_entity.added_on = new Date();
-        file_entity.project = project;
-        file_entity.type = queryParams.type;
-        file_entity.name = escapedFileName;
+        if (!queryParams.chunk || queryParams.last) {
+            // Save the file to the database
+            const file_entity = new FileEntity();
+            file_entity.added_by = added_by;
+            file_entity.added_on = new Date();  
+            file_entity.project = project;
+            file_entity.type = queryParams.type;
+            file_entity.name = escapedFileName;
 
-        this.fileRepository.save(file_entity);
+            this.fileRepository.save(file_entity);
+        }
     }
 
     async delete(
@@ -146,4 +149,17 @@ export class FileService {
         // Delete the file from the database
         await this.fileRepository.delete(file.id);
     }
+
+    async assembleChunks(filename: string, totalChunks: number) {
+        const writer = fs.createWriteStream(`./uploads/${filename}`);
+        // for (let i = 1; i <= totalChunks; i++) {
+        //   const chunkPath = `${CHUNKS_DIR}/${filename}.${i}`;
+        //   await pipeline(pump(fs.createReadStream(chunkPath)), pump(writer));
+        //   fs.unlink(chunkPath, (err) => {
+        //     if (err) {
+        //       console.error('Error deleting chunk file:', err);
+        //     }
+        //   });
+        // }
+      }
 }
