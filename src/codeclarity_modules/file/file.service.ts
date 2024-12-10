@@ -72,13 +72,15 @@ export class FileService {
 
         const escapedFileName = escapeString(queryParams.file_name);
 
-        const filePath = join(folderPath, escapedFileName); // Replace with the desired file path
-        const fileStream = fs.createWriteStream(filePath, {flags: "a+"});
+        if (queryParams.last == "false") {
+            const filePath = join(folderPath, escapedFileName); // Replace with the desired file path
+            const fileStream = fs.createWriteStream(filePath, {flags: "a+"});
+    
+            fileStream.write(file.buffer);
+            fileStream.end();
+        }
 
-        fileStream.write(file.buffer);
-        fileStream.end();
-
-        if (!queryParams.chunk || queryParams.last) {
+        if (queryParams.chunk == "false" || queryParams.last == "true") {
             // Save the file to the database
             const file_entity = new FileEntity();
             file_entity.added_by = added_by;

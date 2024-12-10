@@ -28,8 +28,8 @@ import { escapeString } from 'src/utils/cleaner';
 export interface UploadData {
     type: string;
     file_name: string;
-    chunk: boolean;
-    last: boolean;
+    chunk: string;
+    last: string;
 }
 
 @Controller('/file/:project_id')
