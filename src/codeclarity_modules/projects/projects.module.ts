@@ -21,6 +21,7 @@ import { GithubIntegrationService } from '../integrations/github/github.service'
 import { GitlabIntegrationService } from '../integrations/gitlab/gitlab.service';
 import { GithubIntegrationTokenService } from '../integrations/github/githubToken.service';
 import { GitlabIntegrationTokenService } from '../integrations/gitlab/gitlabToken.service';
+import { File } from 'src/entity/codeclarity/File';
 
 @Module({
     imports: [
@@ -34,7 +35,8 @@ import { GitlabIntegrationTokenService } from '../integrations/gitlab/gitlabToke
                 Integration,
                 OrganizationMemberships,
                 Log,
-                RepositoryCache
+                RepositoryCache,
+                File
             ],
             'codeclarity'
         )

@@ -22,9 +22,11 @@ import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemb
 import { Analysis } from 'src/entity/codeclarity/Analysis';
 import { Result } from 'src/entity/codeclarity/Result';
 import { join } from 'path';
-import { promises as fs } from 'fs';
+import { existsSync } from 'fs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { mkdir, rm } from 'fs/promises';
+import { File } from 'src/entity/codeclarity/File';
 
 export enum AllowedOrderByGetProjects {
     IMPORTED_ON = 'imported_on',
@@ -49,6 +51,8 @@ export class ProjectService {
         private organizationRepository: Repository<Organization>,
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>,
+        @InjectRepository(File, 'codeclarity')
+        private fileRepository: Repository<File>,
         @InjectRepository(Integration, 'codeclarity')
         private integrationRepository: Repository<Integration>,
         @InjectRepository(OrganizationMemberships, 'codeclarity')
@@ -196,7 +200,7 @@ export class ProjectService {
         const added_project = await this.projectRepository.save(project);
 
         const folderPath = join('/private', user.userId, added_project.id);
-        await fs.mkdir(folderPath, { recursive: true });
+        await mkdir(folderPath, { recursive: true });
 
         await this.organizationLoggerService.addAuditLog(
             ActionType.ProjectCreate,
@@ -388,6 +392,10 @@ export class ProjectService {
         const project = await this.projectRepository.findOneOrFail({
             where: {
                 id: id
+            },
+            relations: {
+                files: true,
+                added_by: true
             }
         });
 
@@ -423,6 +431,16 @@ export class ProjectService {
             }
 
             await this.analysisRepository.remove(analysis);
+        }
+
+        // Remove project folder
+        const filePath = join('/private', project.added_by.id, project.id);
+        if (existsSync(filePath)) {
+            await rm(filePath, {recursive: true, force: true});
+        }
+
+        for (const file of project.files) {
+            await this.fileRepository.remove(file)
         }
 
         await this.projectRepository.delete(id);
