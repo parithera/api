@@ -4,7 +4,7 @@ services:
             context: ../../api
             dockerfile: .cloud/docker/Dockerfile
             target: api-dev
-        image: ceherzog/api-dev:latest
+        image: codeclarityce/api-dev:latest
         restart: always
         command: yarn run start:debug
         env_file:
