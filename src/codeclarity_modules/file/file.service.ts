@@ -71,13 +71,105 @@ export class FileService {
         }
 
         const escapedFileName = escapeString(queryParams.file_name);
+        const baseName = escapedFileName.split(".", 1)[0];
+        // Pad the id with zeros until it is 5 characters long
+        const paddedId = queryParams.id.toString().padStart(5, '0');
+        const fileNameWithSuffix = `${baseName}.part${paddedId}`;
 
         if (queryParams.last == "false") {
-            const filePath = join(folderPath, escapedFileName); // Replace with the desired file path
+            const filePath = join(folderPath, fileNameWithSuffix); // Replace with the desired file path
+            const fileStream = fs.createWriteStream(filePath, {flags: "a+"});
+    
+            // Handle errors during writing or opening the file
+            fileStream.on('error', (err) => {
+                console.error('File stream error:', err);
+            });
+
+            if (file.buffer) {
+                await crypto.subtle.digest('SHA-256', file.buffer).then((hash) => {
+                    const hashArray = Array.from(new Uint8Array(hash));
+                    const stringHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    if (queryParams.hash != stringHash) {
+                        console.error("NOT THE SAME HASH!");
+                        console.error('Hash:', stringHash);
+                        console.error('Original Hash:', queryParams.hash)
+                    }
+                });
+            }
+            fileStream.write(file.buffer);
+            await new Promise((resolve, reject) => {
+                fileStream.end();  // This automatically calls resolve on finish
+        
+                fileStream.on('finish', resolve);
+                fileStream.on('error', reject);
+            });
+        } else {
+            const filePath = join(folderPath, fileNameWithSuffix); // Replace with the desired file path
             const fileStream = fs.createWriteStream(filePath, {flags: "a+"});
     
             fileStream.write(file.buffer);
-            fileStream.end();
+            await new Promise((resolve, reject) => {
+                fileStream.end();  // This automatically calls resolve on finish
+        
+                fileStream.on('finish', resolve);
+                fileStream.on('error', reject);
+            });
+
+            // Get all files in folderPath and sort them alphabetically by name
+            const files = fs.readdirSync(folderPath).sort();
+            // Remove any files that don't match the expected pattern (e.g., .part01)
+            const validFiles = [];
+            for (const file of files) {
+                if (/\.part\d{5}$/.test(file)) {  // Check if the file does not have a .partXX extension
+                    validFiles.push(file);  // Add to list but do not delete from disk
+                }
+            }
+
+            let index = 0;
+            for (const file of validFiles) {
+                const match = file.match(/(\d+)$/);
+                if (match) {
+                    const currentIdx = parseInt(match[1], 10);
+                    if (currentIdx !== index) {
+                        console.log(`Missing chunk at index ${index} in file: ${file}`);
+                    }
+                    index++;
+                }
+            }
+
+
+            // Concatenate their content to finalFileStream
+            for (let i = 0; i < validFiles.length; i++) {
+                const finalFilePath = join(folderPath, escapedFileName); // Replace with the desired file path
+                const finalFileStream = fs.createWriteStream(finalFilePath, {flags: "a+"});
+                // Handle errors during writing or opening the file
+                finalFileStream.on('error', (err) => {
+                    console.error('File stream error:', err);
+                });
+
+                try {
+                    const fileContent = fs.readFileSync(join(folderPath, validFiles[i]));
+                    finalFileStream.write(fileContent);
+                } catch {
+                    console.error(`Error reading file ${validFiles[i]}`);
+                }
+
+                // Remove the temp file after its content has been written to the final file
+                if (validFiles[i] !== escapedFileName) {
+                    try {
+                        fs.unlinkSync(join(folderPath, validFiles[i]));
+                    } catch {
+                        console.error(`Error deleting temp file ${validFiles[i]}`);
+                    }
+                }
+
+                await new Promise((resolve, reject) => {
+                    finalFileStream.end();
+                    finalFileStream.on('finish', resolve);
+                    finalFileStream.on('error', reject);
+                });
+            }
+            
         }
 
         if (queryParams.chunk == "false" || queryParams.last == "true") {

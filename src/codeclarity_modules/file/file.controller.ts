@@ -30,6 +30,8 @@ export interface UploadData {
     file_name: string;
     chunk: string;
     last: string;
+    id: string;
+    hash: string;
 }
 
 @Controller('/file/:project_id')
