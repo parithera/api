@@ -118,9 +118,9 @@ export class AnalyzersService {
         const analyzer = await this.analyzerRepository
             .createQueryBuilder('analyzer')
             .leftJoinAndSelect('analyzer.organization', 'organization')
-            .where('organization.id = :orgId', { orgId })
+            .where('(organization.id = :orgId or analyzer.global = true)', { orgId })
+            // .orWhere('analyzer.global = true')
             .andWhere('analyzer.name = :name', { name })
-            .orWhere('analyzer.global = true')
             .getOne();
 
         if (!analyzer) {
