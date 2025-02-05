@@ -197,7 +197,6 @@ export class AnalysesService {
             }
             const message: AnalysisStartMessageCreate = {
                 analysis_id: created_analysis.id,
-                project_id: projectId,
                 integration_id: integration_id,
                 organization_id: orgId
             };

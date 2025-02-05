@@ -19,6 +19,7 @@ export enum ActionClassType {
 }
 
 export enum ActionType {
+    SampleCreate = 'SampleCreate',
     ProjectCreate = 'ProjectCreate',
     ProjectUpdate = 'ProjectUpdate',
     ProjectDelete = 'ProjectDelete',
