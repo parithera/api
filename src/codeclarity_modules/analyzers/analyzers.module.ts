@@ -17,6 +17,7 @@ import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemb
             'codeclarity'
         )
     ],
+    exports: [AnalyzersService],
     providers: [AnalyzersService, OrganizationLoggerService, OrganizationsMemberService],
     controllers: [AnalyzersController]
 })

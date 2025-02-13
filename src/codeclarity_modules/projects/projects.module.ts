@@ -41,6 +41,7 @@ import { File } from 'src/entity/codeclarity/File';
             'codeclarity'
         )
     ],
+    exports: [ProjectService],
     providers: [
         ProjectMemberService,
         ProjectService,

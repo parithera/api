@@ -20,6 +20,9 @@ import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemb
             'codeclarity'
         )
     ],
+    exports: [
+        AnalysesService
+    ],
     providers: [
         AnalysesService,
         AnalysesMemberService,
