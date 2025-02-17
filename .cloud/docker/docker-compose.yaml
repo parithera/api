@@ -13,6 +13,7 @@ services:
             - ../../api:/app
             - ../../.cloud/env:/app/env
             - ../../private:/private
+            - ../../scripts:/scripts
         ports:
             - 9229:9229
             - 3000:3000
