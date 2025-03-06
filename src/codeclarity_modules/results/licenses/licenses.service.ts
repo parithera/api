@@ -1,30 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { PaginatedResponse } from 'src/types/apiResponses';
-import { AuthenticatedUser } from 'src/types/auth/types';
+import { PaginatedResponse } from 'src/types/apiResponses.types';
+import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 import { AnalysisResultsService } from '../results.service';
 import { paginate } from 'src/codeclarity_modules/results/utils/utils';
-import { Output as LicensesOutput } from 'src/types/entities/services/Licenses';
-import { LicenseInfo, DepShortInfo } from 'src/types/entities/frontend/Licenses';
+import { Output as LicensesOutput } from 'src/codeclarity_modules/results/licenses/licenses.types';
+import { LicenseInfo, DepShortInfo } from 'src/codeclarity_modules/results/licenses/licenses2.types';
 import { filter } from 'src/codeclarity_modules/results/licenses/utils/filter';
 import { sort } from 'src/codeclarity_modules/results/licenses/utils/sort';
-import { Output as SbomOutput } from 'src/types/entities/services/Sbom';
-import { LicenseRepository } from 'src/codeclarity_modules/knowledge/LicenseRepository';
+import { Output as SbomOutput } from 'src/codeclarity_modules/results/sbom/sbom.types';
+import { LicenseRepository } from 'src/codeclarity_modules/knowledge/license/license.repository';
 import { getLicensesResult } from './utils/utils';
-import { UnknownWorkspace } from 'src/types/errors/types';
+import { UnknownWorkspace } from 'src/types/error.types';
 import { getSbomResult } from '../sbom/utils/utils';
-import { StatusResponse } from 'src/types/entities/services/Status';
-import { Package, Version } from 'src/entity/knowledge/Package';
+import { StatusResponse } from 'src/codeclarity_modules/results/status.types';
+import { Version } from 'src/codeclarity_modules/knowledge/package/package.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Result } from 'src/entity/codeclarity/Result';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
 
 @Injectable()
 export class LicensesService {
     constructor(
         private readonly analysisResultsService: AnalysisResultsService,
         private readonly licenseRepository: LicenseRepository,
-        @InjectRepository(Package, 'knowledge')
-        private packageRepository: Repository<Package>,
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>
     ) {}

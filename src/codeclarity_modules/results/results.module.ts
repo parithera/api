@@ -1,35 +1,28 @@
-import { Module } from '@nestjs/common';
-import { AnalysisResultsService } from './results.service';
-import { OrganizationsMemberService } from '../organizations/organizationMember.service';
-import { ProjectMemberService } from '../projects/projectMember.service';
-import { AnalysesMemberService } from '../analyses/analysesMembership.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Organization } from 'src/entity/codeclarity/Organization';
-import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
-import { Project } from 'src/entity/codeclarity/Project';
-import { Analysis } from 'src/entity/codeclarity/Analysis';
+import { forwardRef, Module } from '@nestjs/common';
 import { VulnerabilitiesModule } from './vulnerabilities/vulnerabilities.module';
 import { SbomModule } from './sbom/sbom.module';
 import { PatchingModule } from './patching/patching.module';
 import { LicenseModule } from './licenses/licenses.module';
+import { OrganizationsModule } from 'src/base_modules/organizations/organizations.module';
+import { AnalysesModule } from 'src/base_modules/analyses/analyses.module';
+import { AnalysisResultsRepository } from './results.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [Analysis, Organization, Project, OrganizationMemberships],
-            'codeclarity'
-        ),
+        OrganizationsModule,
+        forwardRef(() => AnalysesModule),
         VulnerabilitiesModule,
         SbomModule,
         PatchingModule,
-        LicenseModule
+        LicenseModule,
+        TypeOrmModule.forFeature(
+            [Result],
+            'codeclarity'
+        ),
     ],
-    providers: [
-        AnalysisResultsService,
-        OrganizationsMemberService,
-        ProjectMemberService,
-        AnalysesMemberService
-    ],
-    controllers: []
+    exports: [AnalysisResultsRepository],
+    providers: [AnalysisResultsRepository]
 })
 export class ResultsModule {}

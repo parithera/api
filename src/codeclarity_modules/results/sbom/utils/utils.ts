@@ -4,19 +4,19 @@ import {
     SbomDependency,
     Output as SBOMOutput,
     Status
-} from 'src/types/entities/services/Sbom';
-import { Output as LicenseOutput } from 'src/types/entities/services/Licenses';
-import { Output as VulnsOutput } from 'src/types/entities/services/Vulnerabilities';
+} from 'src/codeclarity_modules/results/sbom/sbom.types';
+import { Output as LicenseOutput } from 'src/codeclarity_modules/results/licenses/licenses.types';
+import { Output as VulnsOutput } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
 import {
     EntityNotFound,
     PluginFailed,
     PluginResultNotAvailable,
     UnknownWorkspace
-} from 'src/types/errors/types';
+} from 'src/types/error.types';
 import { getLicensesResult } from '../../licenses/utils/utils';
 import { getVulnsResult } from '../../vulnerabilities/utils/utils';
-import { Result } from 'src/entity/codeclarity/Result';
-import { Package } from 'src/entity/knowledge/Package';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
+import { Package } from 'src/codeclarity_modules/knowledge/package/package.entity';
 import { Repository } from 'typeorm';
 
 export async function getSbomData(

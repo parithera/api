@@ -1,34 +1,25 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PatchingService } from './patching.service';
 import { PatchingController } from './patching.controller';
 import { AnalysisResultsService } from '../results.service';
-import { Result } from 'src/entity/codeclarity/Result';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrganizationsService } from 'src/codeclarity_modules/organizations/organizations.service';
-import { OrganizationsMemberService } from 'src/codeclarity_modules/organizations/organizationMember.service';
-import { ProjectMemberService } from 'src/codeclarity_modules/projects/projectMember.service';
-import { AnalysesMemberService } from 'src/codeclarity_modules/analyses/analysesMembership.service';
-import { Organization } from 'src/entity/codeclarity/Organization';
-import { User } from 'src/entity/codeclarity/User';
-import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
-import { Project } from 'src/entity/codeclarity/Project';
-import { Analysis } from 'src/entity/codeclarity/Analysis';
-import { Invitation } from 'src/entity/codeclarity/Invitation';
-import { EmailService } from 'src/codeclarity_modules/email/email.service';
-import { Email } from 'src/entity/codeclarity/Email';
+import { UsersModule } from 'src/base_modules/users/users.module';
+import { OrganizationsModule } from 'src/base_modules/organizations/organizations.module';
+import { AnalysesModule } from 'src/base_modules/analyses/analyses.module';
+import { ProjectsModule } from 'src/base_modules/projects/projects.module';
+import { EmailModule } from 'src/base_modules/email/email.module';
 
 @Module({
     imports: [
+        UsersModule,
+        OrganizationsModule,
+        forwardRef(() => AnalysesModule),
+        forwardRef(() => ProjectsModule),
+        EmailModule,
         TypeOrmModule.forFeature(
             [
-                Result,
-                Organization,
-                User,
-                OrganizationMemberships,
-                Project,
-                Analysis,
-                Invitation,
-                Email
+                Result
             ],
             'codeclarity'
         )
@@ -36,11 +27,6 @@ import { Email } from 'src/entity/codeclarity/Email';
     providers: [
         PatchingService,
         AnalysisResultsService,
-        OrganizationsService,
-        OrganizationsMemberService,
-        ProjectMemberService,
-        AnalysesMemberService,
-        EmailService
     ],
     controllers: [PatchingController]
 })

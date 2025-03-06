@@ -1,7 +1,7 @@
-import { PluginFailed, PluginResultNotAvailable } from 'src/types/errors/types';
-import { Output as PatchesOutput } from 'src/types/entities/services/Patching';
-import { Status } from 'src/types/apiResponses';
-import { Result } from 'src/entity/codeclarity/Result';
+import { PluginFailed, PluginResultNotAvailable } from 'src/types/error.types';
+import { Output as PatchesOutput } from 'src/codeclarity_modules/results/patching/patching.types';
+import { Status } from 'src/types/apiResponses.types';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
 import { Repository } from 'typeorm';
 
 export async function getPatchingResult(

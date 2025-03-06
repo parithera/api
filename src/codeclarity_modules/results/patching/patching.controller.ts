@@ -1,8 +1,8 @@
 import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { PatchingService } from './patching.service';
-import { Response } from 'src/types/apiResponses';
+import { Response } from 'src/types/apiResponses.types';
 import { AuthUser } from 'src/decorators/UserDecorator';
-import { AuthenticatedUser } from 'src/types/auth/types';
+import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 
 @Controller('/org/:org_id/projects/:project_id/analysis')
 export class PatchingController {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AuthenticatedUser } from 'src/types/auth/types';
+import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 import {
     AttackVectorDist,
     CIAImpact,
@@ -9,28 +9,26 @@ import {
     QuickStats,
     SeverityInfoByWeek,
     Trend
-} from 'src/types/entities/frontend/Dashboard';
-import { OrganizationsMemberService } from '../organizations/organizationMember.service';
-import { MemberRole } from 'src/types/entities/frontend/OrgMembership';
+} from 'src/codeclarity_modules/dashboard/dashboard.types';
+import { MemberRole } from 'src/base_modules/organizations/memberships/orgMembership.types';
 import {
     PaginationConfig,
     PaginationUserSuppliedConf,
     TypedPaginatedData
-} from 'src/types/paginated/types';
-import { OWASPRepository } from 'src/codeclarity_modules/knowledge/OWASPRepository';
+} from 'src/types/pagination.types';
 import moment from 'moment';
-import { SortDirection } from 'src/types/sort/types';
-import { Organization } from 'src/entity/codeclarity/Organization';
-import { LicenseDist, Output as SbomOutput } from 'src/types/entities/services/Sbom';
-import { Output as VulnsOutput } from 'src/types/entities/services/Vulnerabilities';
+import { SortDirection } from 'src/types/sort.types';
+import { Organization } from 'src/base_modules/organizations/organization.entity';
+import { LicenseDist, Output as SbomOutput } from 'src/codeclarity_modules/results/sbom/sbom.types';
+import { Output as VulnsOutput } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { OrganizationsRepository } from 'src/base_modules/organizations/organizations.repository';
 
 @Injectable()
 export class DashboardService {
     constructor(
-        private readonly orgMemberService: OrganizationsMemberService,
-        private readonly owaspRepository: OWASPRepository,
+        private readonly organizationsRepository: OrganizationsRepository,
         @InjectRepository(Organization, 'codeclarity')
         private organizationRepository: Repository<Organization>
     ) {}
@@ -55,7 +53,7 @@ export class DashboardService {
     ): Promise<SeverityInfoByWeek[]> {
         if (!dateRangeStart) dateRangeStart = moment().subtract(1, 'months').toDate();
         if (!dateRangeEnd) dateRangeEnd = moment().toDate();
-        await this.orgMemberService.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         const res = await this.organizationRepository
             .createQueryBuilder('org')
@@ -142,7 +140,7 @@ export class DashboardService {
     ): Promise<AttackVectorDist[]> {
         if (!dateRangeStart) dateRangeStart = moment().subtract(2, 'months').toDate();
         if (!dateRangeEnd) dateRangeEnd = moment().toDate();
-        await this.orgMemberService.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         const res = await this.organizationRepository
             .createQueryBuilder('org')
@@ -212,7 +210,7 @@ export class DashboardService {
     ): Promise<CIAImpact[]> {
         if (!dateRangeStart) dateRangeStart = moment().subtract(2, 'months').toDate();
         if (!dateRangeEnd) dateRangeEnd = moment().toDate();
-        await this.orgMemberService.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         const res = await this.organizationRepository
             .createQueryBuilder('org')
@@ -273,7 +271,7 @@ export class DashboardService {
     ): Promise<LicenseDist> {
         if (!dateRangeStart) dateRangeStart = moment().subtract(2, 'months').toDate();
         if (!dateRangeEnd) dateRangeEnd = moment().toDate();
-        await this.orgMemberService.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         const res = await this.organizationRepository
             .createQueryBuilder('org')
@@ -330,7 +328,7 @@ export class DashboardService {
     ): Promise<LatestVulns> {
         if (!dateRangeStart) dateRangeStart = moment().subtract(2, 'months').toDate();
         if (!dateRangeEnd) dateRangeEnd = moment().toDate();
-        await this.orgMemberService.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         const res = await this.organizationRepository
             .createQueryBuilder('org')
@@ -411,7 +409,7 @@ export class DashboardService {
     ): Promise<QuickStats> {
         if (!dateRangeStart) dateRangeStart = moment().subtract(2, 'months').toDate();
         if (!dateRangeEnd) dateRangeEnd = moment().toDate();
-        await this.orgMemberService.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         const res = await this.organizationRepository
             .createQueryBuilder('org')
@@ -491,7 +489,7 @@ export class DashboardService {
     ): Promise<TypedPaginatedData<ProjectQuickStats>> {
         if (!dateRangeStart) dateRangeStart = moment().subtract(2, 'months').toDate();
         if (!dateRangeEnd) dateRangeEnd = moment().toDate();
-        await this.orgMemberService.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         enum AllowedOrderBy {
             PROJECT = 'project_name',

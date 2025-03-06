@@ -1,23 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { PaginatedResponse } from 'src/types/apiResponses';
+import { PaginatedResponse } from 'src/types/apiResponses.types';
 import { AnalysisResultsService } from '../results.service';
-import { AuthenticatedUser } from 'src/types/auth/types';
+import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 import {
-    Dependency,
     DependencyDetails,
     Output as SBOMOutput,
     SbomDependency,
     WorkspacesOutput
-} from 'src/types/entities/services/Sbom';
+} from 'src/codeclarity_modules/results/sbom/sbom.types';
 import { paginate } from 'src/codeclarity_modules/results/utils/utils';
 import { getDependencyData, getSbomResult } from 'src/codeclarity_modules/results/sbom/utils/utils';
 import { filter } from './utils/filter';
 import { sort } from './utils/sort';
-import { EntityNotFound, PluginResultNotAvailable, UnknownWorkspace } from 'src/types/errors/types';
-import { StatusResponse } from 'src/types/entities/services/Status';
-import { AnalysisStats, newAnalysisStats } from 'src/types/entities/frontend/Sbom';
-import { Result } from 'src/entity/codeclarity/Result';
-import { Package } from 'src/entity/knowledge/Package';
+import { EntityNotFound, PluginResultNotAvailable, UnknownWorkspace } from 'src/types/error.types';
+import { StatusResponse } from 'src/codeclarity_modules/results/status.types';
+import { AnalysisStats, newAnalysisStats } from 'src/codeclarity_modules/results/sbom/sbom2.types';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
+import { Package } from 'src/codeclarity_modules/knowledge/package/package.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 

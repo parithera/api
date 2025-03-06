@@ -9,23 +9,23 @@ import {
     ReferenceInfo,
     SeverityInfo,
     OtherInfo
-} from 'src/types/entities/frontend/Vulnerability';
-import { Vulnerability, AffectedInfo } from 'src/types/entities/services/Vulnerabilities';
+} from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities2.types';
+import { Vulnerability, AffectedInfo } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
 import { getVersionsSatisfyingConstraint } from 'src/codeclarity_modules/results/utils/utils';
 import { satisfies } from 'semver';
-import { VersionsRepository } from 'src/codeclarity_modules/knowledge/PackageVersionsRepository';
-import { OSVRepository } from 'src/codeclarity_modules/knowledge/OSVRepository';
-import { CWERepository } from 'src/codeclarity_modules/knowledge/CWERepository';
-import { NVDRepository } from 'src/codeclarity_modules/knowledge/NVDRepository';
-import { PackageRepository } from 'src/codeclarity_modules/knowledge/PackageRepository';
-import { OWASPRepository } from 'src/codeclarity_modules/knowledge/OWASPRepository';
-import { Dependency } from 'src/types/entities/services/Sbom';
-import { CVSS2, CVSS3, CVSS31 } from 'src/types/entities/knowledge/CVSS';
-import { PatchInfo } from 'src/types/entities/services/Patching';
-import { OwaspTop10Info } from 'src/types/entities/knowledge/OWASP';
-import { NVD } from 'src/entity/knowledge/NVD';
-import { OSV } from 'src/entity/knowledge/OSV';
-import { Version } from 'src/entity/knowledge/Package';
+import { VersionsRepository } from 'src/codeclarity_modules/knowledge/package/packageVersions.repository';
+import { OSVRepository } from 'src/codeclarity_modules/knowledge/osv/osv.repository';
+import { CWERepository } from 'src/codeclarity_modules/knowledge/cwe/cwe.repository';
+import { NVDRepository } from 'src/codeclarity_modules/knowledge/nvd/nvd.repository';
+import { PackageRepository } from 'src/codeclarity_modules/knowledge/package/package.repository';
+import { OWASPRepository } from 'src/codeclarity_modules/knowledge/owasp/owasp.repository';
+import { Dependency } from 'src/codeclarity_modules/results/sbom/sbom.types';
+import { CVSS2, CVSS3, CVSS31 } from 'src/codeclarity_modules/knowledge/cvss.types';
+import { PatchInfo } from 'src/codeclarity_modules/results/patching/patching.types';
+import { OwaspTop10Info } from 'src/codeclarity_modules/knowledge/owasp/owasp.types';
+import { NVD } from 'src/codeclarity_modules/knowledge/nvd/nvd.entity';
+import { OSV } from 'src/codeclarity_modules/knowledge/osv/osv.entity';
+import { Version } from 'src/codeclarity_modules/knowledge/package/package.entity';
 
 abstract class BaseReportGenerator {
     patchesData: PatchInfo;

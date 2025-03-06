@@ -1,35 +1,34 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LicensesService } from './licenses.service';
 import { LicensesController } from './licenses.controller';
-import { Result } from 'src/entity/codeclarity/Result';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
 import { AnalysisResultsService } from '../results.service';
-import { LicenseRepository } from 'src/codeclarity_modules/knowledge/LicenseRepository';
-import { Package } from 'src/entity/knowledge/Package';
-import { OrganizationsMemberService } from 'src/codeclarity_modules/organizations/organizationMember.service';
-import { ProjectMemberService } from 'src/codeclarity_modules/projects/projectMember.service';
-import { AnalysesMemberService } from 'src/codeclarity_modules/analyses/analysesMembership.service';
-import { License } from 'src/entity/knowledge/License';
-import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
-import { Project } from 'src/entity/codeclarity/Project';
-import { Analysis } from 'src/entity/codeclarity/Analysis';
+import { LicenseRepository } from 'src/codeclarity_modules/knowledge/license/license.repository';
+import { License } from 'src/codeclarity_modules/knowledge/license/license.entity';
+import { OrganizationsModule } from 'src/base_modules/organizations/organizations.module';
+import { ProjectsModule } from 'src/base_modules/projects/projects.module';
+import { AnalysesModule } from 'src/base_modules/analyses/analyses.module';
+import { LicensesRepository } from './licenses.repository';
 
 @Module({
     imports: [
+        OrganizationsModule,
+        forwardRef(() => ProjectsModule),
+        forwardRef(() => AnalysesModule),
         TypeOrmModule.forFeature(
-            [Result, OrganizationMemberships, Project, Analysis],
+            [Result],
             'codeclarity'
         ),
-        TypeOrmModule.forFeature([Package, License], 'knowledge')
+        TypeOrmModule.forFeature([License], 'knowledge')
     ],
     providers: [
         LicensesService,
         AnalysisResultsService,
         LicenseRepository,
-        OrganizationsMemberService,
-        ProjectMemberService,
-        AnalysesMemberService
+        LicensesRepository,
     ],
+    exports: [LicensesRepository],
     controllers: [LicensesController]
 })
 export class LicenseModule {}

@@ -15,15 +15,15 @@ import {
     NoDataResponse,
     TypedPaginatedResponse,
     TypedResponse
-} from 'src/types/apiResponses';
+} from 'src/types/apiResponses.types';
 import { DependencyPatchPolicyService } from './dependencyPatch.service';
 import { AuthUser } from 'src/decorators/UserDecorator';
-import { AuthenticatedUser } from 'src/types/auth/types';
+import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 import {
     DependencyPatchPolicy,
     DependencyPatchPolicyCreateBody,
     DependencyPatchPolicyPatchBody
-} from 'src/types/entities/frontend/DependencyPatchPolicy';
+} from 'src/codeclarity_modules/policies/dependencyPatch/dependencyPatchPolicy.types';
 
 @Controller('org/:org_id/policies/dependency_patch')
 export class DependencyPatchPolicyController {

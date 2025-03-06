@@ -1,9 +1,9 @@
 import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { SBOMService } from './sbom.service';
-import { PaginatedResponse, Response } from 'src/types/apiResponses';
+import { PaginatedResponse, Response } from 'src/types/apiResponses.types';
 import { AuthUser } from 'src/decorators/UserDecorator';
-import { AuthenticatedUser } from 'src/types/auth/types';
-import { WorkspacesOutput } from 'src/types/entities/services/Sbom';
+import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
+import { WorkspacesOutput } from 'src/codeclarity_modules/results/sbom/sbom.types';
 
 @Controller('/org/:org_id/projects/:project_id/analysis')
 export class SBOMController {

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PaginatedResponse } from 'src/types/apiResponses';
+import { PaginatedResponse } from 'src/types/apiResponses.types';
 import {
     AffectedVuln,
     Vulnerability,
     VulnerabilityMerged
-} from 'src/types/entities/services/Vulnerabilities';
-import { AuthenticatedUser } from 'src/types/auth/types';
+} from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
+import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 import { AnalysisResultsService } from '../results.service';
 import {
     isNoneSeverity,
@@ -21,18 +21,18 @@ import {
 } from 'src/codeclarity_modules/results/vulnerabilities/utils/utils';
 import { filter } from 'src/codeclarity_modules/results/vulnerabilities/utils/filter';
 import { sort } from 'src/codeclarity_modules/results/vulnerabilities/utils/sort';
-import { UnknownWorkspace } from 'src/types/errors/types';
-import { Output as SBOMOutput } from 'src/types/entities/services/Sbom';
+import { UnknownWorkspace } from 'src/types/error.types';
+import { Output as SBOMOutput } from 'src/codeclarity_modules/results/sbom/sbom.types';
 import { getSbomResult } from '../sbom/utils/utils';
-import { Output as VulnsOutput } from 'src/types/entities/services/Vulnerabilities';
-import { StatusResponse } from 'src/types/entities/services/Status';
-import { AnalysisStats, newAnalysisStats } from 'src/types/entities/frontend/Vulnerability';
-import { NVD } from 'src/entity/knowledge/NVD';
-import { OSV } from 'src/entity/knowledge/OSV';
-import { CWE } from 'src/entity/knowledge/CWE';
+import { Output as VulnsOutput } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
+import { StatusResponse } from 'src/codeclarity_modules/results/status.types';
+import { AnalysisStats, newAnalysisStats } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities2.types';
+import { NVD } from 'src/codeclarity_modules/knowledge/nvd/nvd.entity';
+import { OSV } from 'src/codeclarity_modules/knowledge/osv/osv.entity';
+import { CWE } from 'src/codeclarity_modules/knowledge/cwe/cwe.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Result } from 'src/entity/codeclarity/Result';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
 
 @Injectable()
 export class FindingsService {

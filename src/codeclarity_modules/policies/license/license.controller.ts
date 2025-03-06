@@ -12,18 +12,18 @@ import {
 } from '@nestjs/common';
 import { AuthUser } from 'src/decorators/UserDecorator';
 import { LicensePolicyService } from './license.service';
-import { AuthenticatedUser } from 'src/types/auth/types';
+import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 import {
     CreatedResponse,
     NoDataResponse,
     TypedPaginatedResponse,
     TypedResponse
-} from 'src/types/apiResponses';
+} from 'src/types/apiResponses.types';
 import {
     LicensePolicyCreateBody,
     LicensePolicyPatchBody
-} from 'src/types/entities/frontend/LicensePolicy';
-import { Policy, PolicyFrontend } from 'src/entity/codeclarity/Policy';
+} from 'src/codeclarity_modules/policies/license/licensePolicy.types';
+import { Policy, PolicyFrontend } from 'src/codeclarity_modules/policies/policy.entity';
 
 @Controller('org/:org_id/policies/license_policy')
 export class LicensePolicyController {

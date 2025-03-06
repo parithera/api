@@ -1,51 +1,37 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { FindingsService } from './vulnerabilities.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Result } from 'src/entity/codeclarity/Result';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
 import { AnalysisResultsService } from '../results.service';
-import { NVD } from 'src/entity/knowledge/NVD';
-import { OSV } from 'src/entity/knowledge/OSV';
-import { CWE } from 'src/entity/knowledge/CWE';
-import { OrganizationsMemberService } from 'src/codeclarity_modules/organizations/organizationMember.service';
-import { ProjectMemberService } from 'src/codeclarity_modules/projects/projectMember.service';
-import { AnalysesMemberService } from 'src/codeclarity_modules/analyses/analysesMembership.service';
-import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
-import { Project } from 'src/entity/codeclarity/Project';
-import { Analysis } from 'src/entity/codeclarity/Analysis';
+import { NVD } from 'src/codeclarity_modules/knowledge/nvd/nvd.entity';
+import { OSV } from 'src/codeclarity_modules/knowledge/osv/osv.entity';
+import { CWE } from 'src/codeclarity_modules/knowledge/cwe/cwe.entity';
 import { FindingsController } from './vulnerabilities.controller';
 import { FindingService } from './vulnerability.service';
-import { OSVRepository } from 'src/codeclarity_modules/knowledge/OSVRepository';
-import { NVDRepository } from 'src/codeclarity_modules/knowledge/NVDRepository';
-import { NVDReportGenerator, OSVReportGenerator } from './services/reportGenerator';
-import { VersionsRepository } from 'src/codeclarity_modules/knowledge/PackageVersionsRepository';
-import { CWERepository } from 'src/codeclarity_modules/knowledge/CWERepository';
-import { PackageRepository } from 'src/codeclarity_modules/knowledge/PackageRepository';
-import { OWASPRepository } from 'src/codeclarity_modules/knowledge/OWASPRepository';
-import { Package, Version } from 'src/entity/knowledge/Package';
+import { OrganizationsModule } from 'src/base_modules/organizations/organizations.module';
+import { ProjectsModule } from 'src/base_modules/projects/projects.module';
+import { AnalysesModule } from 'src/base_modules/analyses/analyses.module';
+import { KnowledgeModule } from 'src/codeclarity_modules/knowledge/knowledge.module';
+import { FindingsRepository } from './vulnerabilities.repository';
 
 @Module({
     imports: [
+        OrganizationsModule,
+        forwardRef(() => ProjectsModule),
+        forwardRef(() => AnalysesModule),
+        KnowledgeModule,
         TypeOrmModule.forFeature(
-            [Result, OrganizationMemberships, Project, Analysis],
+            [Result],
             'codeclarity'
         ),
-        TypeOrmModule.forFeature([NVD, OSV, CWE, Package, Version], 'knowledge')
+        TypeOrmModule.forFeature([NVD, OSV, CWE], 'knowledge')
     ],
+    exports: [FindingsRepository],
     providers: [
         FindingService,
         FindingsService,
         AnalysisResultsService,
-        OSVRepository,
-        NVDRepository,
-        OSVReportGenerator,
-        NVDReportGenerator,
-        VersionsRepository,
-        CWERepository,
-        OrganizationsMemberService,
-        ProjectMemberService,
-        AnalysesMemberService,
-        PackageRepository,
-        OWASPRepository
+        FindingsRepository
     ],
     controllers: [FindingsController]
 })

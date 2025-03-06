@@ -1,31 +1,31 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SBOMController } from './sbom.controller';
 import { SBOMService } from './sbom.service';
 import { AnalysisResultsService } from '../results.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Result } from 'src/entity/codeclarity/Result';
-import { Package } from 'src/entity/knowledge/Package';
-import { OrganizationsMemberService } from 'src/codeclarity_modules/organizations/organizationMember.service';
-import { ProjectMemberService } from 'src/codeclarity_modules/projects/projectMember.service';
-import { AnalysesMemberService } from 'src/codeclarity_modules/analyses/analysesMembership.service';
-import { OrganizationMemberships } from 'src/entity/codeclarity/OrganizationMemberships';
-import { Project } from 'src/entity/codeclarity/Project';
-import { Analysis } from 'src/entity/codeclarity/Analysis';
+import { Result } from 'src/codeclarity_modules/results/result.entity';
+import { Package } from 'src/codeclarity_modules/knowledge/package/package.entity';
+import { OrganizationsModule } from 'src/base_modules/organizations/organizations.module';
+import { AnalysesModule } from 'src/base_modules/analyses/analyses.module';
+import { ProjectsModule } from 'src/base_modules/projects/projects.module';
+import { SBOMRepository } from './sbom.repository';
 
 @Module({
     imports: [
+        OrganizationsModule,
+        forwardRef(() => AnalysesModule),
+        forwardRef(() => ProjectsModule),
         TypeOrmModule.forFeature(
-            [Result, OrganizationMemberships, Project, Analysis],
+            [Result],
             'codeclarity'
         ),
         TypeOrmModule.forFeature([Package], 'knowledge')
     ],
+    exports: [SBOMRepository],
     providers: [
         SBOMService,
         AnalysisResultsService,
-        OrganizationsMemberService,
-        ProjectMemberService,
-        AnalysesMemberService
+        SBOMRepository,
     ],
     controllers: [SBOMController]
 })

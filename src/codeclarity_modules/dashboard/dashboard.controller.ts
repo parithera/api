@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthenticatedUser } from 'src/types/auth/types';
+import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 import { AuthUser } from 'src/decorators/UserDecorator';
-import { TypedPaginatedResponse, TypedResponse } from 'src/types/apiResponses';
+import { TypedPaginatedResponse, TypedResponse } from 'src/types/apiResponses.types';
 import {
     AttackVectorDist,
     CIAImpact,
@@ -18,13 +18,13 @@ import {
     ProjectQuickStats,
     QuickStats,
     SeverityInfoByWeek
-} from 'src/types/entities/frontend/Dashboard';
+} from 'src/codeclarity_modules/dashboard/dashboard.types';
 import { APIDocTypedManyResponseDecorator } from 'src/decorators/TypedManyResponse';
 import { APIDocTypedResponseDecorator } from 'src/decorators/TypedResponse';
-import { InternalError, NotAuthenticated, NotAuthorized } from 'src/types/errors/types';
+import { InternalError, NotAuthenticated, NotAuthorized } from 'src/types/error.types';
 import { ApiErrorDecorator } from 'src/decorators/ApiException';
 import { APIDocTypedPaginatedResponseDecorator } from 'src/decorators/TypedPaginatedResponse';
-import { LicenseDist } from 'src/types/entities/services/Sbom';
+import { LicenseDist } from 'src/codeclarity_modules/results/sbom/sbom.types';
 
 @Controller('/org/:org_id/dashboard')
 export class DashboardController {
