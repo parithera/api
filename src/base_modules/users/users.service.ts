@@ -7,7 +7,8 @@ import {
     SocialType,
     UserCompleteSocialCreateBody,
     UserCreateBody,
-    UserPasswordPatchBody
+    UserPasswordPatchBody,
+    UserPatchBody
 } from 'src/base_modules/users/user.types';
 import { EmailService } from '../email/email.service';
 import { genRandomString, hash } from 'src/utils/crypto';
@@ -22,7 +23,7 @@ import { Email, EmailType } from 'src/base_modules/email/email.entity';
 import { OrganizationsRepository } from '../organizations/organizations.repository';
 import { EmailRepository } from '../email/email.repository';
 import { UsersRepository } from './users.repository';
-import { FailedToSendAccountRegistrationVerificationEmail } from './users.errors';
+import { CannotPerformActionOnSocialAccount, FailedToSendAccountRegistrationVerificationEmail } from './users.errors';
 import { AccountRegistrationVerificationTokenInvalidOrExpired, PasswordsDoNotMatch } from '../auth/auth.errors';
 
 /**
@@ -312,7 +313,63 @@ export class UsersService {
         passwordPatchBody: UserPasswordPatchBody,
         authenticatedUser: AuthenticatedUser
     ): Promise<void> {
-        throw new Error('Method not implemented.');
+        if (userId !== authenticatedUser.userId) {
+            throw new NotAuthorized()
+        }
+
+        if (passwordPatchBody.password !== passwordPatchBody.password_confirmation) {
+            throw new PasswordsDoNotMatch()
+        }
+        const user = await this.usersRepository.getUserById(authenticatedUser.userId)
+
+        if (user.social) {
+            throw new CannotPerformActionOnSocialAccount()
+        }
+
+        
+        const [match,_] = await this.authService.validateCredentials(user.email, passwordPatchBody.old_password)
+        if (!match) {
+            throw new Error('Old password not correct')
+        }
+
+        const newPasswordHash = await this.authService.hashPassword(passwordPatchBody.password);
+
+        user.password = newPasswordHash
+
+        await this.usersRepository.saveUser(user)
+    }
+
+
+
+    /**
+     * Update a user's password
+     * @throws {EntityNotFound} If the user does not exist
+     * @throws {NotAuthorized} If the user is not authorized to perform the action on the indicated userId
+     *
+     * @param userId The id of the user to update
+     * @param userPatchBody The user update data
+     * @param authenticatedUser The authenticated user
+     */
+    async updatePersonalInfo(
+        userId: string,
+        userPatchBody: UserPatchBody,
+        authenticatedUser: AuthenticatedUser
+    ): Promise<void> {
+        if (userId !== authenticatedUser.userId) {
+            throw new NotAuthorized()
+        }
+
+        const user = await this.usersRepository.getUserById(authenticatedUser.userId)
+        
+        if (userPatchBody.first_name){
+            user.first_name = userPatchBody.first_name
+        }
+
+        if (userPatchBody.last_name){
+            user.last_name = userPatchBody.last_name
+        }
+
+        await this.usersRepository.saveUser(user)
     }
 
     /**

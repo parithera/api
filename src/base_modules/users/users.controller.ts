@@ -21,7 +21,8 @@ import {
     ResendAccountRegEmailBody,
     UserCompleteSocialCreateBody,
     UserPasswordPatchBody,
-    RegistrationConfirmationBody
+    RegistrationConfirmationBody,
+    UserPatchBody
 } from 'src/base_modules/users/user.types';
 import { User } from 'src/base_modules/users/users.entity';
 import { SetupAlreadyDone, FailedToSendAccountRegistrationVerificationEmail, CannotPerformActionOnNormalAccount, CannotPerformActionOnSocialAccount } from './users.errors';
@@ -122,20 +123,20 @@ export class UsersController {
         return {};
     }
 
-    // @ApiTags('Users')
-    // @APIDocNoDataResponseDecorator()
-    // @ApiErrorDecorator({ statusCode: 403, errors: [NotAuthorized] })
-    // @ApiErrorDecorator({ statusCode: 404, errors: [EntityNotFound] })
-    // @ApiErrorDecorator({ statusCode: 500, errors: [InternalError] })
-    // @Patch(':user_id/update_personal')
-    // async updateAccountInfo(
-    //     @AuthUser() user: AuthenticatedUser,
-    //     @Body() patch: UserPatchBody,
-    //     @Param('user_id') user_id: string
-    // ): Promise<NoDataResponse> {
-    //     await this.usersService.updatePersonalInfo(user_id, patch, user);
-    //     return {};
-    // }
+    @ApiTags('Users')
+    @APIDocNoDataResponseDecorator()
+    @ApiErrorDecorator({ statusCode: 403, errors: [NotAuthorized] })
+    @ApiErrorDecorator({ statusCode: 404, errors: [EntityNotFound] })
+    @ApiErrorDecorator({ statusCode: 500, errors: [InternalError] })
+    @Patch(':user_id/update_personal')
+    async updateAccountInfo(
+        @AuthUser() user: AuthenticatedUser,
+        @Body() patch: UserPatchBody,
+        @Param('user_id') user_id: string
+    ): Promise<NoDataResponse> {
+        await this.usersService.updatePersonalInfo(user_id, patch, user);
+        return {};
+    }
 
     @ApiTags('Users')
     @APIDocNoDataResponseDecorator()
