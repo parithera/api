@@ -87,6 +87,20 @@ export class OrganizationsRepository {
     async removeMemberships(memberships: OrganizationMemberships[]): Promise<void> {
         await this.membershipRepository.remove(memberships);
     }
+
+    /**
+     * Removes multiple memberships from the database.
+     *
+     * @param memberships - An array of OrganizationMemberships entities to remove.
+     */
+    async removeUserMemberships(userId: string): Promise<void> {
+        const memberships = await this.membershipRepository.find({
+            where: {
+                user: {id: userId}
+            }
+        })
+        await this.membershipRepository.remove(memberships);
+    }
     
     /**
      * Retrieve the membership role of a user in a specific organization.

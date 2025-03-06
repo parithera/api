@@ -11,7 +11,7 @@ import { IntegrationsModule } from '../integrations.module';
 
 @Module({
     imports: [
-        UsersModule,
+        forwardRef(() => UsersModule),
         OrganizationsModule,
         forwardRef(() => IntegrationsModule),
         TypeOrmModule.forFeature(

@@ -17,7 +17,7 @@ import { ProjectsRepository } from './projects.repository';
 
 @Module({
     imports: [
-        UsersModule,
+        forwardRef(() => UsersModule),
         OrganizationsModule,
         FileModule,
         IntegrationsModule,

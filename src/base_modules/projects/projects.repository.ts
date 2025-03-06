@@ -72,6 +72,11 @@ export class ProjectsRepository {
         await this.projectRepository.delete(projectId)
     }
 
+    async deleteUserProjects(userId: string) {
+        const projects = await this.projectRepository.find({where:{added_by:{id: userId}}})
+        await this.projectRepository.remove(projects)
+    }
+
     async saveProject(project: Project): Promise<Project> {
         return this.projectRepository.save(project)
     }

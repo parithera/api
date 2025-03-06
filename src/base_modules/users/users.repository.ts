@@ -5,6 +5,8 @@ import {
 import { User } from 'src/base_modules/users/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { OrganizationsRepository } from '../organizations/organizations.repository';
+import { ProjectsRepository } from '../projects/projects.repository';
 
 /**
  * This service offers methods for working with users
@@ -12,6 +14,8 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class UsersRepository {
     constructor(
+        private readonly organizationsRepository: OrganizationsRepository,
+        private readonly projectsRepository: ProjectsRepository,
         @InjectRepository(User, 'codeclarity')
         private userRepository: Repository<User>,
     ) { }
@@ -61,6 +65,8 @@ export class UsersRepository {
     }
 
     async deleteUser(userId: string) {
+        await this.organizationsRepository.removeUserMemberships(userId)
+        await this.projectsRepository.deleteUserProjects(userId)
         await this.userRepository.delete(userId)
     }
 }

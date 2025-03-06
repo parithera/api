@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AnalyzersController } from './analyzers.controller';
 import { AnalyzersService } from './analyzers.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,7 +9,7 @@ import { AnalyzersRepository } from './analyzers.repository';
 
 @Module({
     imports: [
-        UsersModule,
+        forwardRef(() => UsersModule),
         OrganizationsModule,
         TypeOrmModule.forFeature(
             [Analyzer],

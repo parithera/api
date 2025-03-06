@@ -12,7 +12,7 @@ import { EmailModule } from 'src/base_modules/email/email.module';
 
 @Module({
     imports: [
-        UsersModule,
+        forwardRef(() => UsersModule),
         OrganizationsModule,
         forwardRef(() => AnalysesModule),
         forwardRef(() => ProjectsModule),

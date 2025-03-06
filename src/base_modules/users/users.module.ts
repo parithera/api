@@ -7,11 +7,13 @@ import { AuthModule } from '../auth/auth.module';
 import { EmailModule } from '../email/email.module';
 import { UsersRepository } from './users.repository';
 import { OrganizationsModule } from '../organizations/organizations.module';
+import { ProjectsModule } from '../projects/projects.module';
 
 @Module({
     imports: [
         OrganizationsModule,
         EmailModule,
+        ProjectsModule,
         forwardRef(() => AuthModule),
         TypeOrmModule.forFeature(
             [User],
