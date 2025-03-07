@@ -83,7 +83,10 @@ export class OrganizationsService {
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
         const membership = await this.organizationsRepository.getMembershipByOrganizationAndUser(
             orgId, user.userId, {
-            organization: true,
+            organization: {
+                created_by: true,
+                organizationMemberships: true
+            },
             user: false
         }
         )
@@ -157,8 +160,18 @@ export class OrganizationsService {
         searchKey?: string,
         sortBy?: string,
         sortDirection?: SortDirection
-    ): Promise<TypedPaginatedData<TeamMember>> {
-        throw new Error('Method not implemented.');
+    ): Promise<TypedPaginatedData<OrganizationMemberships>> {
+        const memberships = await this.organizationsRepository.getMembershipsByOrganizationId(orgId, { organization: true, user: true })
+        return {
+            data: memberships,
+            page: 0,
+            entry_count: 0,
+            entries_per_page: 0,
+            total_entries: 0,
+            total_pages: 0,
+            matching_count: 0,
+            filter_count: {}
+        }
     }
 
     /**
@@ -183,11 +196,7 @@ export class OrganizationsService {
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.OWNER);
 
         const invitedUser = await this.usersRepository.getUserByEmail(inviteBody.user_email)
-
-        if (!invitedUser) {
-            throw new UserDoesNotExist();
-        }
-
+        
         const inviter = await this.usersRepository.getUserById(user.userId, {})
 
         const org = await this.organizationsRepository.getOrganizationById(orgId)
@@ -431,7 +440,7 @@ export class OrganizationsService {
      * @param user The authenticated user
      */
     async leaveOrg(orgId: string, user: AuthenticatedUser): Promise<void> {
-        throw new Error('Method not implemented.');
+        await this.organizationsRepository.leaveOrganization(user.userId, orgId)
     }
 
     /**
