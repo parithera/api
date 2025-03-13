@@ -81,7 +81,7 @@ export class LicensePolicyCreateBody {
     name: string;
 
     @IsString()
-    @Length(10, 250)
+    @Length(0, 250)
     description: string;
 
     @IsNotEmpty()
