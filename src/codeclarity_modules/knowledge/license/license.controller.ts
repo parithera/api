@@ -19,7 +19,6 @@ export class LicenseController {
 
     @Get()
     async getAll(@AuthUser() user: AuthenticatedUser): Promise<TypedResponse<Array<License>>> {
-        console.log(user);
         return { data: await this.licenseService.getAll() };
     }
 }
