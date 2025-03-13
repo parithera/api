@@ -69,7 +69,7 @@ export class AnalysesService {
         const analyzer = await this.analyzersRepository.getAnalyzerById(analysisData.analyzer_id);
 
         // Fetch the project details using the project ID
-        const project = await this.projectsRepository.getProjectById(projectId);
+        const project = await this.projectsRepository.getProjectById(projectId, {integration: true});
 
         // Get the user details of the creator of the analysis
         const creator = await this.usersRepository.getUserById(user.userId);
