@@ -31,7 +31,7 @@ export class DashboardService {
         private readonly organizationsRepository: OrganizationsRepository,
         @InjectRepository(Organization, 'codeclarity')
         private organizationRepository: Repository<Organization>
-    ) {}
+    ) { }
 
     /**
      * Returns the severity info for all projects and their most recent analysis
@@ -237,11 +237,19 @@ export class DashboardService {
                     for (const workspace_name of Object.keys(res.workspaces)) {
                         const workspace = res.workspaces[workspace_name];
                         workspace.Vulnerabilities.forEach((vuln) => {
-                            const cia = vuln.Severity.ConfidentialityImpact;
-                            const impact = vuln.Severity.Impact;
                             ciaImpacts.push({
-                                cia: cia,
-                                impact: impact
+                                cia: 'Confidentiality',
+                                impact: vuln.Severity.ConfidentialityImpactNumerical
+                            });
+
+                            ciaImpacts.push({
+                                cia: 'Integrity',
+                                impact: vuln.Severity.IntegrityImpactNumerical
+                            });
+
+                            ciaImpacts.push({
+                                cia: 'Availability',
+                                impact: vuln.Severity.AvailabilityImpactNumerical
                             });
                         });
                     }

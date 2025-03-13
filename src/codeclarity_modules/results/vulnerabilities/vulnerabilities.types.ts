@@ -157,6 +157,9 @@ export interface Severity {
     ConfidentialityImpact: string;
     IntegrityImpact: string;
     AvailabilityImpact: string;
+    ConfidentialityImpactNumerical: number;
+    IntegrityImpactNumerical: number;
+    AvailabilityImpactNumerical: number;
 }
 
 export enum SeverityType {
