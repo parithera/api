@@ -28,7 +28,7 @@ export class SBOMService {
         private resultRepository: Repository<Result>,
         @InjectRepository(Package, 'knowledge')
         private packageRepository: Repository<Package>
-    ) {}
+    ) { }
 
     async getStats(
         orgId: string,
@@ -79,22 +79,30 @@ export class SBOMService {
             sbom.workspaces[workspace]?.start.dependencies?.length || 0;
         wStats.number_of_dev_dependencies =
             sbom.workspaces[workspace]?.start.dev_dependencies?.length || 0;
+
+        wPrevStats.number_of_non_dev_dependencies =
+            sbomPrevious.workspaces[workspace]?.start.dependencies?.length || 0;
+        wPrevStats.number_of_dev_dependencies =
+            sbomPrevious.workspaces[workspace]?.start.dev_dependencies?.length || 0;
+
+        wStats.number_of_direct_dependencies = wStats.number_of_dev_dependencies + wStats.number_of_non_dev_dependencies
+        wPrevStats.number_of_direct_dependencies = wPrevStats.number_of_dev_dependencies + wPrevStats.number_of_non_dev_dependencies
+
         for (const dep of Object.values(dependencies)) {
             for (const version of Object.values(dep)) {
-                // TODO check if correct
                 if (version.Bundled) wStats.number_of_bundled_dependencies += 1;
-                // if (version.peer) wStats.number_of_peer_dependencies += 1;
                 if (version.Optional) wStats.number_of_optional_dependencies += 1;
-                wStats.number_of_direct_dependencies += 1;
+                if (version.Transitive) wStats.number_of_transitive_dependencies +=1;
+                wStats.number_of_dependencies += 1
             }
         }
 
         for (const dep of Object.values(dependenciesPrevious)) {
             for (const version of Object.values(dep)) {
                 if (version.Bundled) wPrevStats.number_of_bundled_dependencies += 1;
-                // if (version.peer) wPrevStats.number_of_peer_dependencies += 1;
                 if (version.Optional) wPrevStats.number_of_optional_dependencies += 1;
-                wPrevStats.number_of_direct_dependencies += 1;
+                if (version.Transitive) wPrevStats.number_of_transitive_dependencies +=1;
+                wPrevStats.number_of_dependencies += 1
             }
         }
 
