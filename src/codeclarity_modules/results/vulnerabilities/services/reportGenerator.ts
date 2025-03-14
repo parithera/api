@@ -59,136 +59,132 @@ abstract class BaseReportGenerator {
         this.owaspRepository = owaspRepository;
     }
 
-    async #getVersions(): Promise<Version[]> {
-        if (!this.dependencyData) return [];
+    // async getPatchedVersionsString(source: string): Promise<string> {
+    //     // const affectedData: AffectedInfo = this.vulnsData.Affected[source];
+    //     const affectedData: AffectedInfo = { Ranges: [], Exact: [], Universal: false };
+    //     const patchedStringParts: string[] = [];
+    //     const versions = await this.#getVersions();
+    //     const versionsStrings = versions.map((a) => a.version);
 
-        if (this.versions == undefined) {
-            const versions = await this.versionsRepository.getDependencyVersions(
-                // this.dependencyData.name
-                ''
-            );
-            this.versions = versions;
-            return versions;
-        } else {
-            return this.versions;
-        }
-    }
+    //     if (affectedData.Ranges.length > 0) {
+    //         for (let i = 0; i < affectedData.Ranges.length; i++) {
+    //             let patchedStringPart = '';
+    //             const currentPart = affectedData.Ranges[i];
+    //             let previousPart = null;
+    //             let nextPart = null;
 
-    async getPatchedVersionsString(source: string): Promise<string> {
-        // const affectedData: AffectedInfo = this.vulnsData.Affected[source];
-        const affectedData: AffectedInfo = { Ranges: [], Exact: [], Universal: false };
-        const patchedStringParts: string[] = [];
-        const versions = await this.#getVersions();
-        const versionsStrings = versions.map((a) => a.version);
+    //             if (i - 1 >= 0) {
+    //                 previousPart = affectedData.Ranges[i - 1];
+    //             }
 
-        if (affectedData.Ranges.length > 0) {
-            for (let i = 0; i < affectedData.Ranges.length; i++) {
-                let patchedStringPart = '';
-                const currentPart = affectedData.Ranges[i];
-                let previousPart = null;
-                let nextPart = null;
+    //             if (i + 1 < affectedData.Ranges.length - 1) {
+    //                 nextPart = affectedData.Ranges[i + 1];
+    //             }
 
-                if (i - 1 >= 0) {
-                    previousPart = affectedData.Ranges[i - 1];
-                }
+    //             if (previousPart) {
+    //                 if (previousPart.FixedString == null) {
+    //                     continue;
+    //                 } else {
+    //                     const versionsBetween = getVersionsSatisfyingConstraint(
+    //                         versionsStrings,
+    //                         `>= ${previousPart.FixedString} < ${currentPart.IntroducedString}`
+    //                     );
+    //                     if (versionsBetween.length > 1) {
+    //                         patchedStringPart += `>= ${previousPart.FixedString} < ${currentPart.IntroducedString}`;
+    //                     } else {
+    //                         patchedStringPart += `${previousPart.FixedString}`;
+    //                     }
+    //                 }
+    //             } else {
+    //                 if (currentPart.FixedString && nextPart == null) {
+    //                     const versionsBetween = getVersionsSatisfyingConstraint(
+    //                         versionsStrings,
+    //                         `>= ${currentPart.FixedString}`
+    //                     );
+    //                     if (versionsBetween.length > 1) {
+    //                         patchedStringPart += `>= ${currentPart.FixedString}`;
+    //                     } else {
+    //                         if (versionsBetween.length > 0) {
+    //                             patchedStringPart += versionsBetween[0];
+    //                         }
+    //                     }
+    //                 } else if (currentPart.FixedString && nextPart != null) {
+    //                     const versionsBetween = getVersionsSatisfyingConstraint(
+    //                         versionsStrings,
+    //                         `>= ${currentPart.FixedString} < ${nextPart.IntroducedString}`
+    //                     );
+    //                     if (versionsBetween.length > 1) {
+    //                         patchedStringPart += `>= ${currentPart.FixedString}`;
+    //                     } else {
+    //                         if (versionsBetween.length > 0) {
+    //                             patchedStringPart += versionsBetween[0];
+    //                         }
+    //                     }
+    //                 }
+    //             }
 
-                if (i + 1 < affectedData.Ranges.length - 1) {
-                    nextPart = affectedData.Ranges[i + 1];
-                }
+    //             if (!patchedStringParts.includes(patchedStringPart))
+    //                 patchedStringParts.push(patchedStringPart);
 
-                if (previousPart) {
-                    if (previousPart.FixedString == null) {
-                        continue;
-                    } else {
-                        const versionsBetween = getVersionsSatisfyingConstraint(
-                            versionsStrings,
-                            `>= ${previousPart.FixedString} < ${currentPart.IntroducedString}`
-                        );
-                        if (versionsBetween.length > 1) {
-                            patchedStringPart += `>= ${previousPart.FixedString} < ${currentPart.IntroducedString}`;
-                        } else {
-                            patchedStringPart += `${previousPart.FixedString}`;
-                        }
-                    }
-                } else {
-                    if (currentPart.FixedString && nextPart == null) {
-                        const versionsBetween = getVersionsSatisfyingConstraint(
-                            versionsStrings,
-                            `>= ${currentPart.FixedString}`
-                        );
-                        if (versionsBetween.length > 1) {
-                            patchedStringPart += `>= ${currentPart.FixedString}`;
-                        } else {
-                            if (versionsBetween.length > 0) {
-                                patchedStringPart += versionsBetween[0];
-                            }
-                        }
-                    } else if (currentPart.FixedString && nextPart != null) {
-                        const versionsBetween = getVersionsSatisfyingConstraint(
-                            versionsStrings,
-                            `>= ${currentPart.FixedString} < ${nextPart.IntroducedString}`
-                        );
-                        if (versionsBetween.length > 1) {
-                            patchedStringPart += `>= ${currentPart.FixedString}`;
-                        } else {
-                            if (versionsBetween.length > 0) {
-                                patchedStringPart += versionsBetween[0];
-                            }
-                        }
-                    }
-                }
+    //             if (i == affectedData.Ranges.length - 1) {
+    //                 if (currentPart.FixedString) {
+    //                     if (!patchedStringParts.includes(`>= ${currentPart.FixedString}`))
+    //                         patchedStringParts.push(`>= ${currentPart.FixedString}`);
+    //                 }
+    //             }
+    //         }
+    //     } else if (affectedData.Exact.length > 0) {
+    //         // get all version other than those listed in exact
+    //         for (const version of versions) {
+    //             if (!affectedData.Exact.includes(version.version)) {
+    //                 patchedStringParts.push(version.version);
+    //             }
+    //         }
+    //     } else if (affectedData.Universal) {
+    //         // no pached version exists
+    //     }
 
-                if (!patchedStringParts.includes(patchedStringPart))
-                    patchedStringParts.push(patchedStringPart);
-
-                if (i == affectedData.Ranges.length - 1) {
-                    if (currentPart.FixedString) {
-                        if (!patchedStringParts.includes(`>= ${currentPart.FixedString}`))
-                            patchedStringParts.push(`>= ${currentPart.FixedString}`);
-                    }
-                }
-            }
-        } else if (affectedData.Exact.length > 0) {
-            // get all version other than those listed in exact
-            for (const version of versions) {
-                if (!affectedData.Exact.includes(version.version)) {
-                    patchedStringParts.push(version.version);
-                }
-            }
-        } else if (affectedData.Universal) {
-            // no pached version exists
-        }
-
-        return patchedStringParts.join(' || ');
-    }
+    //     return patchedStringParts.join(' || ');
+    // }
 
     async getVulnerableVersionsString(source: string): Promise<string> {
-        // const affectedData: AffectedInfo = this.vulnsData.Affected[source];
-        const affectedData: AffectedInfo = { Ranges: [], Exact: [], Universal: false };
+        let affectedData: AffectedInfo = { Ranges: [], Exact: [], Universal: false };
+        if (source == 'NVD')
+            affectedData = this.vulnsData.NVDMatch.AffectedInfo[0];
+        else
+            affectedData = this.vulnsData.OSVMatch.AffectedInfo[0];
+
         const affectedStringParts: string[] = [];
 
-        if (affectedData.Ranges.length > 0) {
+        if (affectedData.Ranges && affectedData.Ranges.length > 0) {
             for (const range of affectedData.Ranges) {
                 let affectedStringPart = '';
-                if (range.IntroducedString) affectedStringPart += `>= ${range.IntroducedString}`;
-                if (range.FixedString && range.IntroducedString)
-                    affectedStringPart += ` < ${range.FixedString}`;
-                else if (range.FixedString) affectedStringPart += `< ${range.FixedString}`;
+                affectedStringPart += `>= ${range.IntroducedSemver.Major}.${range.IntroducedSemver.Minor}.${range.IntroducedSemver.Patch}`
+                if (range.IntroducedSemver.PreReleaseTag != '')
+                    affectedStringPart += `-${range.IntroducedSemver.PreReleaseTag}`;
+                
+                affectedStringPart += ` < ${range.FixedSemver.Major}.${range.FixedSemver.Minor}.${range.FixedSemver.Patch}`
+                if (range.FixedSemver.PreReleaseTag != '')
+                    affectedStringPart += `-${range.FixedSemver.PreReleaseTag}`
                 affectedStringParts.push(affectedStringPart);
             }
-        } else if (affectedData.Exact.length > 0) {
+        } 
+        
+        else if (affectedData.Exact.length > 0) {
             for (const exact of affectedData.Exact) {
-                affectedStringParts.push(exact);
+                affectedStringParts.push(exact.VersionString);
             }
-        } else if (affectedData.Universal) {
+        } 
+
+        else if (affectedData.Universal) {
             affectedStringParts.push('*');
         }
-
         return affectedStringParts.join(' || ');
     }
 
-    async getVersionsStatusArray(affectedVersionsString: string): Promise<VulnerableVersionInfo[]> {
-        const versions = await this.#getVersions();
+    async getVersionsStatusArray(affectedVersionsString: string, affectedDependencyName: string): Promise<VulnerableVersionInfo[]> {
+        // const versions = await this.#getVersions();
+        const versions: Version[] = []
         const versionsStatusArray: VulnerableVersionInfo[] = [];
         for (const version of versions) {
             if (satisfies(version.version, affectedVersionsString)) {
@@ -558,18 +554,20 @@ export class OSVReportGenerator extends BaseReportGenerator {
             });
         }
 
-        const patchedVersionsString = await this.getPatchedVersionsString('OSV');
+        // const patchedVersionsString = await this.getPatchedVersionsString('OSV');
         const affectedVersionsString = await this.getVulnerableVersionsString('OSV');
-        const versionsStatusArray = await this.getVersionsStatusArray(affectedVersionsString);
+        const versionsStatusArray = await this.getVersionsStatusArray(affectedVersionsString, vulnsData.AffectedDependency);
 
         vulnInfo.version_info.affected_versions_string = affectedVersionsString;
-        vulnInfo.version_info.patched_versions_string = patchedVersionsString;
+        // vulnInfo.version_info.patched_versions_string = patchedVersionsString;
         vulnInfo.version_info.versions = versionsStatusArray;
 
         /** Dependency Info */
         let dependencyInfo: DependencyInfo | undefined;
         try {
             dependencyInfo = await this.getDependencyData();
+            dependencyInfo.name = vulnsData.AffectedDependency
+            dependencyInfo.version = vulnsData.AffectedVersion
         } catch (error) {
             // intentionally empty
         }
@@ -753,17 +751,19 @@ export class NVDReportGenerator extends BaseReportGenerator {
         }
 
         // const patchedVersionsString = await this.getPatchedVersionsString('NVD');
-        // const affectedVersionsString = await this.getVulnerableVersionsString('NVD');
-        // const versionsStatusArray = await this.getVersionsStatusArray(affectedVersionsString);
+        const affectedVersionsString = await this.getVulnerableVersionsString('NVD');
+        const versionsStatusArray = await this.getVersionsStatusArray(affectedVersionsString, vulnsData.AffectedDependency);
 
-        // vulnInfo.version_info.affected_versions_string = affectedVersionsString;
+        vulnInfo.version_info.affected_versions_string = affectedVersionsString;
         // vulnInfo.version_info.patched_versions_string = patchedVersionsString;
-        // vulnInfo.version_info.versions = versionsStatusArray;
+        vulnInfo.version_info.versions = versionsStatusArray;
 
         /** Dependency Info */
         let dependencyInfo: DependencyInfo | undefined;
         try {
             dependencyInfo = await this.getDependencyData();
+            dependencyInfo.name = vulnsData.AffectedDependency
+            dependencyInfo.version = vulnsData.AffectedVersion
         } catch (error) {
             // intentionally empty
         }

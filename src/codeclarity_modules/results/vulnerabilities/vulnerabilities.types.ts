@@ -190,7 +190,7 @@ export interface Vulnerability {
 interface Vuln {
     Vulnerability: any;
     Dependency: any;
-    AffectedInfo: any;
+    AffectedInfo: AffectedInfo[];
     VulnerableEvidenceRange: any;
     VulnerableEvidenceExact: any;
     VulnerableEvidenceUniversal: any;
@@ -223,13 +223,27 @@ export interface AffectedVuln {
     NVDMatch: Vuln;
 }
 
+interface Semver {
+    Major: number,
+    Minor: number,
+    Patch: number,
+    PreReleaseTag: string,
+    MetaData: string
+}
+
+interface Exact {
+    CPEInfo: any,
+    VersionSemver: Semver,
+    VersionString: string
+}
+
 export declare interface AffectedRange {
-    IntroducedString: string;
-    FixedString: string;
+    IntroducedSemver: Semver;
+    FixedSemver: Semver;
 }
 
 export declare interface AffectedInfo {
-    Exact: string[];
+    Exact: Exact[];
     Ranges: AffectedRange[];
     Universal: boolean;
 }
