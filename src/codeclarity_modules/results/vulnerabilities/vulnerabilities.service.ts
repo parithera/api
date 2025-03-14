@@ -15,38 +15,31 @@ import {
     isCriticalSeverity,
     paginate
 } from 'src/codeclarity_modules/results/utils/utils';
-import {
-    getFindingsData,
-    getVulnsResult
-} from 'src/codeclarity_modules/results/vulnerabilities/utils/utils';
-import { filter } from 'src/codeclarity_modules/results/vulnerabilities/utils/filter';
-import { sort } from 'src/codeclarity_modules/results/vulnerabilities/utils/sort';
 import { UnknownWorkspace } from 'src/types/error.types';
 import { Output as SBOMOutput } from 'src/codeclarity_modules/results/sbom/sbom.types';
-import { getSbomResult } from '../sbom/utils/utils';
 import { Output as VulnsOutput } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
 import { StatusResponse } from 'src/codeclarity_modules/results/status.types';
 import { AnalysisStats, newAnalysisStats } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities2.types';
-import { NVD } from 'src/codeclarity_modules/knowledge/nvd/nvd.entity';
-import { OSV } from 'src/codeclarity_modules/knowledge/osv/osv.entity';
-import { CWE } from 'src/codeclarity_modules/knowledge/cwe/cwe.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Result } from 'src/codeclarity_modules/results/result.entity';
+import { VulnerabilitiesUtilsService } from './utils/utils.service';
+import { VulnerabilitiesSortService } from './utils/sort.service';
+import { VulnerabilitiesFilterService } from './utils/filter.service';
+import { SbomUtilsService } from '../sbom/utils/utils';
+import { OSVRepository } from 'src/codeclarity_modules/knowledge/osv/osv.repository';
+import { CWERepository } from 'src/codeclarity_modules/knowledge/cwe/cwe.repository';
+import { NVDRepository } from 'src/codeclarity_modules/knowledge/nvd/nvd.repository';
 
 @Injectable()
-export class FindingsService {
+export class VulnerabilitiesService {
     constructor(
         private readonly analysisResultsService: AnalysisResultsService,
-        @InjectRepository(NVD, 'knowledge')
-        private nvdRepository: Repository<NVD>,
-        @InjectRepository(OSV, 'knowledge')
-        private osvRepository: Repository<OSV>,
-        @InjectRepository(CWE, 'knowledge')
-        private cweRepository: Repository<CWE>,
-        @InjectRepository(Result, 'codeclarity')
-        private resultRepository: Repository<Result>
-    ) {}
+        private readonly findingsUtilsService: VulnerabilitiesUtilsService,
+        private readonly findingsSortService: VulnerabilitiesSortService,
+        private readonly findingsFilterService: VulnerabilitiesFilterService,
+        private readonly sbomUtilsService: SbomUtilsService,
+        private readonly osvRepository: OSVRepository,
+        private readonly nvdRepository: NVDRepository,
+        private readonly cweRepository: CWERepository,
+    ) { }
 
     async getStats(
         orgId: string,
@@ -82,7 +75,7 @@ export class FindingsService {
         let findingsArrayPrevious: Vulnerability[];
         // let dependencyMapPrevious: { [key: string]: Dependency };
 
-        const sbomOutput: SBOMOutput = await getSbomResult(analysisId, this.resultRepository);
+        const sbomOutput: SBOMOutput = await this.sbomUtilsService.getSbomResult(analysisId);
 
         if (!(workspace in sbomOutput.workspaces)) {
             throw new UnknownWorkspace();
@@ -90,10 +83,9 @@ export class FindingsService {
 
         // const dependencyMap: { [key: string]: Dependency } =
         //     sbomOutput.workspaces[workspace].dependencies;
-        const findingsArray: Vulnerability[] = await getFindingsData(
+        const findingsArray: Vulnerability[] = await this.findingsUtilsService.getFindingsData(
             analysisId,
-            workspace,
-            this.resultRepository
+            workspace
         );
 
         try {
@@ -424,10 +416,9 @@ export class FindingsService {
         // for (const dep of dependenciesArray) {
         //     dependenciesMap[dep.key] = dep;
         // }
-        const findings: Vulnerability[] = await getFindingsData(
+        const findings: Vulnerability[] = await this.findingsUtilsService.getFindingsData(
             analysisId,
-            workspace,
-            this.resultRepository
+            workspace
         );
 
         const findingsMerged: Map<string, VulnerabilityMerged> = new Map<
@@ -467,12 +458,12 @@ export class FindingsService {
         }
 
         // Filter, sort and paginate the dependnecies list
-        const [filtered, filterCount] = filter(
+        const [filtered, filterCount] = this.findingsFilterService.filter(
             Array.from(findingsMerged.values()),
             search_key,
             active_filters
         );
-        const sorted = sort(filtered, sort_by, sort_direction);
+        const sorted = this.findingsSortService.sort(filtered, sort_by, sort_direction);
 
         const paginated = paginate<VulnerabilityMerged>(
             sorted,
@@ -500,21 +491,13 @@ export class FindingsService {
             let osvSummary = '';
 
             if (isCve) {
-                const nvd = await this.nvdRepository.findOne({
-                    where: {
-                        nvd_id: finding.Vulnerability
-                    }
-                });
+                const nvd = await this.nvdRepository.getVulnWithoutFailing(finding.Vulnerability)
 
                 if (nvd) {
                     nvdDescription = nvd.descriptions[0].value;
                 }
 
-                const osv = await this.osvRepository.findOne({
-                    where: {
-                        cve: finding.Vulnerability
-                    }
-                });
+                const osv = await this.osvRepository.getVulnByCVEIDWithoutFailing(finding.Vulnerability)
 
                 if (osv) {
                     osvDescription = osv.details;
@@ -523,11 +506,7 @@ export class FindingsService {
             }
 
             if (isGhsa) {
-                const osv = await this.osvRepository.findOne({
-                    where: {
-                        osv_id: finding.Vulnerability
-                    }
-                });
+                const osv = await this.osvRepository.getVulnByOSVIDWithoutFailing(finding.Vulnerability)
 
                 if (osv) {
                     osvDescription = osv.details;
@@ -554,11 +533,7 @@ export class FindingsService {
             // Attach weakness info
             if (finding.Weaknesses) {
                 for (const weakness of finding.Weaknesses) {
-                    const cwe = await this.cweRepository.findOne({
-                        where: {
-                            cwe_id: weakness.WeaknessId.replace('CWE-', '')
-                        }
-                    });
+                    const cwe = await this.cweRepository.getCWEWithoutFailing(weakness.WeaknessId.replace('CWE-', ''))
 
                     if (cwe) {
                         weakness.WeaknessName = cwe.name;
@@ -606,7 +581,7 @@ export class FindingsService {
         // Check if the user is allowed to view this analysis result
         await this.analysisResultsService.checkAccess(orgId, projectId, analysisId, user);
 
-        const vulnsOutput: VulnsOutput = await getVulnsResult(analysisId, this.resultRepository);
+        const vulnsOutput: VulnsOutput = await this.findingsUtilsService.getVulnsResult(analysisId);
 
         if (vulnsOutput.analysis_info.private_errors.length) {
             return {

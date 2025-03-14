@@ -11,7 +11,7 @@ export class PackageRepository {
         private packageRepository: Repository<Package>
     ) {}
 
-    async getPackageInfo(dependencyName: string): Promise<Package> {
+    async getPackageInfo(dependencyName: string, throw_error?: boolean): Promise<Package> {
         if (dependencyName.includes('/')) {
             dependencyName.replace('/', ':');
         }
@@ -24,5 +24,23 @@ export class PackageRepository {
             throw new EntityNotFound();
         }
         return pack;
+    }
+
+    async getVersionInfo(dependency_name:string, dependency_version: string): Promise<Package> {
+        const package_version = await this.packageRepository.findOne({
+            where: {
+                name: dependency_name,
+                versions: {
+                    version: dependency_version
+                }
+            },
+            relations: {
+                versions: true
+            }
+        });
+        if (!package_version) {
+            throw new EntityNotFound();
+        }   
+        return package_version
     }
 }

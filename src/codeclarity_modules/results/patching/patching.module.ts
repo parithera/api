@@ -9,6 +9,9 @@ import { OrganizationsModule } from 'src/base_modules/organizations/organization
 import { AnalysesModule } from 'src/base_modules/analyses/analyses.module';
 import { ProjectsModule } from 'src/base_modules/projects/projects.module';
 import { EmailModule } from 'src/base_modules/email/email.module';
+import { PatchingUtilsService } from './utils/utils';
+import { SbomModule } from '../sbom/sbom.module';
+import { VulnerabilitiesModule } from '../vulnerabilities/vulnerabilities.module';
 
 @Module({
     imports: [
@@ -16,7 +19,9 @@ import { EmailModule } from 'src/base_modules/email/email.module';
         OrganizationsModule,
         forwardRef(() => AnalysesModule),
         forwardRef(() => ProjectsModule),
+        forwardRef(() => VulnerabilitiesModule),
         EmailModule,
+        SbomModule,
         TypeOrmModule.forFeature(
             [
                 Result
@@ -24,9 +29,11 @@ import { EmailModule } from 'src/base_modules/email/email.module';
             'codeclarity'
         )
     ],
+    exports: [PatchingUtilsService],
     providers: [
         PatchingService,
         AnalysisResultsService,
+        PatchingUtilsService
     ],
     controllers: [PatchingController]
 })

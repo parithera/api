@@ -4,31 +4,33 @@ import { LicensesService } from './licenses.service';
 import { LicensesController } from './licenses.controller';
 import { Result } from 'src/codeclarity_modules/results/result.entity';
 import { AnalysisResultsService } from '../results.service';
-import { LicenseRepository } from 'src/codeclarity_modules/knowledge/license/license.repository';
-import { License } from 'src/codeclarity_modules/knowledge/license/license.entity';
 import { OrganizationsModule } from 'src/base_modules/organizations/organizations.module';
 import { ProjectsModule } from 'src/base_modules/projects/projects.module';
 import { AnalysesModule } from 'src/base_modules/analyses/analyses.module';
 import { LicensesRepository } from './licenses.repository';
+import { LicensesUtilsService } from './utils/utils';
+import { KnowledgeModule } from 'src/codeclarity_modules/knowledge/knowledge.module';
+import { SbomModule } from '../sbom/sbom.module';
 
 @Module({
     imports: [
         OrganizationsModule,
         forwardRef(() => ProjectsModule),
         forwardRef(() => AnalysesModule),
+        KnowledgeModule,
+        forwardRef(() => SbomModule),
         TypeOrmModule.forFeature(
             [Result],
             'codeclarity'
-        ),
-        TypeOrmModule.forFeature([License], 'knowledge')
+        )
     ],
     providers: [
         LicensesService,
         AnalysisResultsService,
-        LicenseRepository,
         LicensesRepository,
+        LicensesUtilsService
     ],
-    exports: [LicensesRepository],
+    exports: [LicensesRepository, LicensesUtilsService],
     controllers: [LicensesController]
 })
 export class LicenseModule {}

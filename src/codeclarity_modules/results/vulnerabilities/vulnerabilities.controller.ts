@@ -1,15 +1,15 @@
 import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-import { FindingsService } from './vulnerabilities.service';
+import { VulnerabilitiesService } from './vulnerabilities.service';
 import { PaginatedResponse, Response } from 'src/types/apiResponses.types';
 import { AuthUser } from 'src/decorators/UserDecorator';
 import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
-import { FindingService } from './vulnerability.service';
+import { VulnerabilityService } from './vulnerability.service';
 
 @Controller('/org/:org_id/projects/:project_id/analysis')
 export class FindingsController {
     constructor(
-        private readonly findingService: FindingService,
-        private readonly findingsService: FindingsService
+        private readonly vulnerabilityService: VulnerabilityService,
+        private readonly vulnerabilitiesService: VulnerabilitiesService
     ) {}
 
     @Get(':analysis_id/vulnerabilities')
@@ -26,7 +26,7 @@ export class FindingsController {
         @Query('active_filters') active_filters?: string,
         @Query('search_key') search_key?: string
     ): Promise<PaginatedResponse> {
-        return await this.findingsService.getVulnerabilities(
+        return await this.vulnerabilitiesService.getVulnerabilities(
             org_id,
             project_id,
             analysis_id,
@@ -50,7 +50,7 @@ export class FindingsController {
         @Query('workspace') workspace: string
     ): Promise<Response> {
         return {
-            data: await this.findingsService.getStats(
+            data: await this.vulnerabilitiesService.getStats(
                 org_id,
                 project_id,
                 analysis_id,
@@ -70,7 +70,7 @@ export class FindingsController {
         @Query('workspace') workspace: string
     ): Promise<Response> {
         return {
-            data: await this.findingService.getVulnerability(
+            data: await this.vulnerabilityService.getVulnerability(
                 org_id,
                 project_id,
                 analysis_id,

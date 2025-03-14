@@ -12,14 +12,18 @@ export class CWERepository {
     ) {}
 
     async getCWE(cweId: string): Promise<CWE> {
-        const cwe = await this.cweRepository.findOne({
-            where: {
-                cwe_id: cweId
-            }
-        });
+        const cwe = await this.getCWEWithoutFailing(cweId)
         if (!cwe) {
             throw new EntityNotFound();
         }
         return cwe;
+    }
+
+    async getCWEWithoutFailing(cweId: string): Promise<CWE | null> {
+        return this.cweRepository.findOne({
+            where: {
+                cwe_id: cweId
+            }
+        });
     }
 }

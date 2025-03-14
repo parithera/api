@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { Result } from 'src/codeclarity_modules/results/result.entity';
 
 @Injectable()
-export class FindingsRepository {
+export class VulnerabilitiesRepository {
     constructor(
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>

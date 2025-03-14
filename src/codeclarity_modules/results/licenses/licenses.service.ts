@@ -9,9 +9,9 @@ import { filter } from 'src/codeclarity_modules/results/licenses/utils/filter';
 import { sort } from 'src/codeclarity_modules/results/licenses/utils/sort';
 import { Output as SbomOutput } from 'src/codeclarity_modules/results/sbom/sbom.types';
 import { LicenseRepository } from 'src/codeclarity_modules/knowledge/license/license.repository';
-import { getLicensesResult } from './utils/utils';
+import { LicensesUtilsService } from './utils/utils';
 import { UnknownWorkspace } from 'src/types/error.types';
-import { getSbomResult } from '../sbom/utils/utils';
+import { SbomUtilsService } from '../sbom/utils/utils';
 import { StatusResponse } from 'src/codeclarity_modules/results/status.types';
 import { Version } from 'src/codeclarity_modules/knowledge/package/package.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,6 +23,8 @@ export class LicensesService {
     constructor(
         private readonly analysisResultsService: AnalysisResultsService,
         private readonly licenseRepository: LicenseRepository,
+        private readonly licensesUtilsService:LicensesUtilsService,
+        private readonly sbomUtilsService:SbomUtilsService,
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>
     ) {}
@@ -47,9 +49,8 @@ export class LicensesService {
         if (active_filters_string != null)
             active_filters = active_filters_string.replace('[', '').replace(']', '').split(',');
 
-        const licensesOutput: LicensesOutput = await getLicensesResult(
-            analysisId,
-            this.resultRepository
+        const licensesOutput: LicensesOutput = await this.licensesUtilsService.getLicensesResult(
+            analysisId
         );
 
         const licensesWorkspaceInfo = licensesOutput.workspaces[workspace];
@@ -125,11 +126,10 @@ export class LicensesService {
     ): Promise<{ [key: string]: DepShortInfo }> {
         await this.analysisResultsService.checkAccess(orgId, projectId, analysisId, user);
 
-        const licensesOutput: LicensesOutput = await getLicensesResult(
-            analysisId,
-            this.resultRepository
+        const licensesOutput: LicensesOutput = await this.licensesUtilsService.getLicensesResult(
+            analysisId
         );
-        const sbomOutput: SbomOutput = await getSbomResult(analysisId, this.resultRepository);
+        const sbomOutput: SbomOutput = await this.sbomUtilsService.getSbomResult(analysisId);
 
         // Validate that the workspace exists
         if (!(workspace in licensesOutput.workspaces)) {
@@ -192,7 +192,7 @@ export class LicensesService {
         // Check if the user is allowed to view this analysis result
         await this.analysisResultsService.checkAccess(orgId, projectId, analysisId, user);
 
-        const licensesOutput = await getLicensesResult(analysisId, this.resultRepository);
+        const licensesOutput = await this.licensesUtilsService.getLicensesResult(analysisId);
 
         if (licensesOutput.analysis_info.private_errors.length) {
             return {

@@ -21,7 +21,7 @@ import { ProjectsRepository } from '../projects/projects.repository';
 import { AnalyzersRepository } from '../analyzers/analyzers.repository';
 import { AnalysisResultsRepository } from 'src/codeclarity_modules/results/results.repository';
 import { SBOMRepository } from 'src/codeclarity_modules/results/sbom/sbom.repository';
-import { FindingsRepository } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.repository';
+import { VulnerabilitiesRepository } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.repository';
 import { LicensesRepository } from 'src/codeclarity_modules/results/licenses/licenses.repository';
 import { AnalysesRepository } from './analyses.repository';
 import { AnaylzerMissingConfigAttribute } from '../analyzers/analyzers.errors';
@@ -37,7 +37,7 @@ export class AnalysesService {
         private readonly analyzersRepository: AnalyzersRepository,
         private readonly resultsRepository: AnalysisResultsRepository,
         private readonly sbomRepository: SBOMRepository,
-        private readonly findingsRepository: FindingsRepository,
+        private readonly vulnerabilitiesRepository: VulnerabilitiesRepository,
         private readonly licensesRepository: LicensesRepository,
         private readonly analysesRepository: AnalysesRepository,
     ) { }
@@ -269,7 +269,7 @@ export class AnalysesService {
         const sbomOutput: SbomOutput = await this.sbomRepository.getSbomResult(id);
 
         // Fetch vulnerabilities output for the specified analysis ID
-        const vulnOutput: VulnsOuptut = await this.findingsRepository.getVulnsResult(id);
+        const vulnOutput: VulnsOuptut = await this.vulnerabilitiesRepository.getVulnsResult(id);
 
         // Fetch licenses output for the specified analysis ID
         const licensesOutput: LicensesOutput = await this.licensesRepository.getLicensesResult(id);

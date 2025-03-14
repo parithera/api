@@ -3,33 +3,42 @@ import { Output as PatchesOutput } from 'src/codeclarity_modules/results/patchin
 import { Status } from 'src/types/apiResponses.types';
 import { Result } from 'src/codeclarity_modules/results/result.entity';
 import { Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 
-export async function getPatchingResult(
-    analysis_id: string,
-    resultRepository: Repository<Result>
-): Promise<PatchesOutput> {
-    const result = await resultRepository.findOne({
-        relations: { analysis: true },
-        where: {
-            analysis: {
-                id: analysis_id
+@Injectable()
+export class PatchingUtilsService {
+    constructor(
+        @InjectRepository(Result, 'codeclarity')
+        private resultRepository: Repository<Result>
+    ) { }
+
+    async getPatchingResult(
+        analysis_id: string
+    ): Promise<PatchesOutput> {
+        const result = await this.resultRepository.findOne({
+            relations: { analysis: true },
+            where: {
+                analysis: {
+                    id: analysis_id
+                },
+                plugin: 'js-patching'
             },
-            plugin: 'js-patching'
-        },
-        order: {
-            analysis: {
-                created_on: 'DESC'
-            }
-        },
-        cache: true
-    });
-    if (!result) {
-        throw new PluginResultNotAvailable();
-    }
+            order: {
+                analysis: {
+                    created_on: 'DESC'
+                }
+            },
+            cache: true
+        });
+        if (!result) {
+            throw new PluginResultNotAvailable();
+        }
 
-    const patches: PatchesOutput = result.result as unknown as PatchesOutput;
-    if (patches.analysis_info.status == Status.Failure) {
-        throw new PluginFailed();
+        const patches: PatchesOutput = result.result as unknown as PatchesOutput;
+        if (patches.analysis_info.status == Status.Failure) {
+            throw new PluginFailed();
+        }
+        return patches;
     }
-    return patches;
 }

@@ -24,14 +24,26 @@ export class OSVRepository {
     }
 
     async getVulnCVE(cve: string): Promise<OSV> {
-        const osv = await this.osvRepository.findOne({
-            where: {
-                cve: cve
-            }
-        });
+        const osv = await this.getVulnByCVEIDWithoutFailing(cve)
         if (!osv) {
             throw new EntityNotFound();
         }
         return osv;
+    }
+
+    async getVulnByCVEIDWithoutFailing(cve: string): Promise<OSV|null> {
+        return this.osvRepository.findOne({
+            where: {
+                cve: cve
+            }
+        });
+    }
+
+    async getVulnByOSVIDWithoutFailing(osv_id: string): Promise<OSV|null> {
+        return this.osvRepository.findOne({
+            where: {
+                osv_id: osv_id
+            }
+        });
     }
 }

@@ -9,25 +9,25 @@ import {
     WorkspacesOutput
 } from 'src/codeclarity_modules/results/sbom/sbom.types';
 import { paginate } from 'src/codeclarity_modules/results/utils/utils';
-import { getDependencyData, getSbomResult } from 'src/codeclarity_modules/results/sbom/utils/utils';
+import { SbomUtilsService } from 'src/codeclarity_modules/results/sbom/utils/utils';
 import { filter } from './utils/filter';
 import { sort } from './utils/sort';
 import { EntityNotFound, PluginResultNotAvailable, UnknownWorkspace } from 'src/types/error.types';
 import { StatusResponse } from 'src/codeclarity_modules/results/status.types';
 import { AnalysisStats, newAnalysisStats } from 'src/codeclarity_modules/results/sbom/sbom2.types';
 import { Result } from 'src/codeclarity_modules/results/result.entity';
-import { Package } from 'src/codeclarity_modules/knowledge/package/package.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { PackageRepository } from 'src/codeclarity_modules/knowledge/package/package.repository';
 
 @Injectable()
 export class SBOMService {
     constructor(
         private readonly analysisResultsService: AnalysisResultsService,
+        private readonly sbomUtilsService: SbomUtilsService,
+        private readonly packageRepository: PackageRepository,
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>,
-        @InjectRepository(Package, 'knowledge')
-        private packageRepository: Repository<Package>
     ) { }
 
     async getStats(
@@ -92,7 +92,7 @@ export class SBOMService {
             for (const version of Object.values(dep)) {
                 if (version.Bundled) wStats.number_of_bundled_dependencies += 1;
                 if (version.Optional) wStats.number_of_optional_dependencies += 1;
-                if (version.Transitive) wStats.number_of_transitive_dependencies +=1;
+                if (version.Transitive) wStats.number_of_transitive_dependencies += 1;
                 wStats.number_of_dependencies += 1
             }
         }
@@ -101,7 +101,7 @@ export class SBOMService {
             for (const version of Object.values(dep)) {
                 if (version.Bundled) wPrevStats.number_of_bundled_dependencies += 1;
                 if (version.Optional) wPrevStats.number_of_optional_dependencies += 1;
-                if (version.Transitive) wPrevStats.number_of_transitive_dependencies +=1;
+                if (version.Transitive) wPrevStats.number_of_transitive_dependencies += 1;
                 wPrevStats.number_of_dependencies += 1
             }
         }
@@ -192,7 +192,7 @@ export class SBOMService {
         if (active_filters_string != null)
             active_filters = active_filters_string.replace('[', '').replace(']', '').split(',');
 
-        const sbom: SBOMOutput = await getSbomResult(analysisId, this.resultRepository);
+        const sbom: SBOMOutput = await this.sbomUtilsService.getSbomResult(analysisId);
 
         const dependenciesArray: SbomDependency[] = [];
 
@@ -205,14 +205,8 @@ export class SBOMService {
                     newest_release: version_key
                 };
 
-                const pack = await this.packageRepository.findOne({
-                    where: {
-                        name: dep_key
-                    }
-                });
-                if (pack) {
-                    sbomDependency.newest_release = pack.latest_version;
-                }
+                const pack = await this.packageRepository.getPackageInfo(dep_key)
+                sbomDependency.newest_release = pack.latest_version;
 
                 dependenciesArray.push(sbomDependency);
             }
@@ -242,7 +236,7 @@ export class SBOMService {
     ): Promise<StatusResponse> {
         await this.analysisResultsService.checkAccess(orgId, projectId, analysisId, user);
 
-        const sbom: SBOMOutput = await getSbomResult(analysisId, this.resultRepository);
+        const sbom: SBOMOutput = await this.sbomUtilsService.getSbomResult(analysisId);
 
         if (sbom.analysis_info.private_errors.length) {
             return {
@@ -268,7 +262,7 @@ export class SBOMService {
     ): Promise<WorkspacesOutput> {
         await this.analysisResultsService.checkAccess(orgId, projectId, analysisId, user);
 
-        const sbom: SBOMOutput = await getSbomResult(analysisId, this.resultRepository);
+        const sbom: SBOMOutput = await this.sbomUtilsService.getSbomResult(analysisId);
 
         const map = sbom.analysis_info.work_space_package_file_paths;
 
@@ -304,7 +298,7 @@ export class SBOMService {
     ): Promise<DependencyDetails> {
         await this.analysisResultsService.checkAccess(orgId, projectId, analysisId, user);
 
-        const sbom: SBOMOutput = await getSbomResult(analysisId, this.resultRepository);
+        const sbom: SBOMOutput = await this.sbomUtilsService.getSbomResult(analysisId);
 
         // Validate that the workspace exists
         if (!(workspace in sbom.workspaces)) {
@@ -315,13 +309,12 @@ export class SBOMService {
 
         if (dependencyName in sbom.workspaces[workspace].dependencies) {
             if (dependencyVersion in sbom.workspaces[workspace].dependencies[dependencyName]) {
-                return await getDependencyData(
+                return await this.sbomUtilsService.getDependencyData(
                     analysisId,
                     workspace,
                     dependencyName,
                     dependencyVersion,
-                    sbom,
-                    this.packageRepository
+                    sbom
                 );
             }
         }

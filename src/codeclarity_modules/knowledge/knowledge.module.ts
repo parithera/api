@@ -23,10 +23,14 @@ import {
 @Module({
     imports: [TypeOrmModule.forFeature([License, CWE, Package, NVD, OSV, Version], 'knowledge')],
     exports: [
+        LicenseRepository,
         CWERepository,
+        NPMPackageRepository,
         NVDRepository,
         OSVRepository,
         OWASPRepository,
+        PackageRepository,
+        VersionsRepository,
         NVDReportGenerator,
         OSVReportGenerator
     ],
