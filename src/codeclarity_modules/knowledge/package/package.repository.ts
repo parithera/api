@@ -11,19 +11,26 @@ export class PackageRepository {
         private packageRepository: Repository<Package>
     ) {}
 
-    async getPackageInfo(dependencyName: string, throw_error?: boolean): Promise<Package> {
+    async getPackageInfo(dependencyName: string): Promise<Package> {
         if (dependencyName.includes('/')) {
             dependencyName.replace('/', ':');
         }
-        const pack = await this.packageRepository.findOne({
-            where: {
-                name: dependencyName
-            }
-        });
+        const pack = await this.getPackageInfoWithoutFailing(dependencyName)
         if (!pack) {
             throw new EntityNotFound();
         }
         return pack;
+    }
+
+    async getPackageInfoWithoutFailing(dependencyName: string): Promise<Package|null> {
+        if (dependencyName.includes('/')) {
+            dependencyName.replace('/', ':');
+        }
+        return this.packageRepository.findOne({
+            where: {
+                name: dependencyName
+            }
+        });
     }
 
     async getVersionInfo(dependency_name:string, dependency_version: string): Promise<Package> {

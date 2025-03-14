@@ -205,8 +205,9 @@ export class SBOMService {
                     newest_release: version_key
                 };
 
-                const pack = await this.packageRepository.getPackageInfo(dep_key)
-                sbomDependency.newest_release = pack.latest_version;
+                const pack = await this.packageRepository.getPackageInfoWithoutFailing(dep_key)
+                if(pack)
+                    sbomDependency.newest_release = pack.latest_version;
 
                 dependenciesArray.push(sbomDependency);
             }

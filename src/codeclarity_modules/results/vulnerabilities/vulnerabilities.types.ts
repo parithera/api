@@ -124,7 +124,7 @@ export interface SeverityDist {
 
 export interface WorkSpaceData {
     Vulnerabilities: Vulnerability[];
-    DependencyInfo: { [key: string]: DependencyInfo };
+    // DependencyInfo: { [key: string]: DependencyInfo };
 }
 
 export interface DependencyInfo {
@@ -150,6 +150,7 @@ export interface WeaknessInfo {
 
 export interface Severity {
     Severity: number;
+    SeverityClass: string;
     SeverityType: SeverityType;
     Vector: string;
     Impact: number;

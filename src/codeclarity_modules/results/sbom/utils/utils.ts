@@ -40,58 +40,6 @@ export class SbomUtilsService {
         if (!(workspace in sbom.workspaces)) {
             throw new UnknownWorkspace();
         }
-
-        const dependenciesMap = sbom.workspaces[workspace].dependencies;
-
-        // Attach licenses info if the service has finished
-        try {
-            const licenses: LicenseOutput = await this.licensesUtilsService.getLicensesResult(analysis_id);
-            const workspaceLicenses = licenses.workspaces[workspace].DependencyInfo;
-            // for (const [key, depInfo] of Object.entries(workspaceLicenses)) {
-            //     if (depInfo) {
-            //         dependenciesMap[key].licenses = depInfo.Licenses ?? [];
-            //         dependenciesMap[key].unlicensed = dependenciesMap[key].licenses.length == 0;
-            //         dependenciesMap[key].non_spdx_licenses = depInfo.NonSpdxLicenses ?? [];
-            //         dependenciesMap[key].package_manager = sbom.analysis_info.package_manager;
-            //     }
-            // }
-        } catch (err) {
-            // Nothing to throw here
-        }
-
-        // Attach vulnerability info if the service has finished
-        try {
-            const vulns: VulnsOutput = await this.vulnerabilitiesUtilsService.getVulnsResult(analysis_id);
-            const workspaceDepInfo = vulns.workspaces[workspace].DependencyInfo;
-            // for (const [key, depInfo] of Object.entries(workspaceDepInfo)) {
-            //     dependenciesMap[key].combined_severity = depInfo.Vulnerabilities.map(
-            //         (depInfoVuln) => depInfoVuln.Severity.Severity
-            //     ).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-            //     dependenciesMap[key].vulnerable = depInfo.Vulnerable;
-            //     dependenciesMap[key].vulnerabilities = depInfo.Vulnerabilities.map(
-            //         (depInfoVuln) => depInfoVuln.Vulnerability
-            //     );
-            //     if (depInfo.SeverityDist)
-            //         dependenciesMap[key].severity_dist = {
-            //             critical: depInfo.SeverityDist.critical,
-            //             high: depInfo.SeverityDist.high,
-            //             medium: depInfo.SeverityDist.medium,
-            //             low: depInfo.SeverityDist.low,
-            //             none: depInfo.SeverityDist.none
-            //         };
-            //     else
-            //         dependenciesMap[key].severity_dist = {
-            //             critical: 0,
-            //             high: 0,
-            //             medium: 0,
-            //             low: 0,
-            //             none: 0
-            //         };
-            // }
-        } catch (err) {
-            // Nothing to throw here
-        }
-
         // Generate the list of deps (SBOM)
         const dependenciesArray: Dependency[] = [];
 
@@ -139,7 +87,7 @@ export class SbomUtilsService {
         sbom: SBOMOutput
     ): Promise<DependencyDetails> {
         const package_version = await this.packageRepository.getVersionInfo(dependency_name, dependency_version)
-        
+
         const dependency = sbom.workspaces[workspace].dependencies[dependency_name][dependency_version];
 
         const version = package_version.versions[0];
@@ -157,65 +105,29 @@ export class SbomUtilsService {
             release_date: version.extra.Time,
             lastest_release_date: package_version.time,
             vulnerabilities: [],
+            severity_dist: {
+                critical: 0,
+                high: 0,
+                medium: 0,
+                low: 0,
+                none: 0
+            }
         };
 
-        // dependency_details.transitive = dependency
-
-        // // Attach licenses info if the service has finished
-        // try {
-        //     const licenses: LicenseOutput = await getLicensesResult(db, analysis_id);
-        //     const license = licenses.workspaces[workspace].DependencyInfo[dependency.key];
-        //     dependency.licenses = license?.Licenses ?? [];
-        //     dependency.unlicensed = dependency.licenses.length == 0;
-        //     dependency.non_spdx_licenses = license?.NonSpdxLicenses ?? [];
-        //     dependency.package_manager = sbom.analysis_info.package_manager;
-        // } catch (err) {
-        //     // Nothing to throw here
-        // }
-
         // Attach vulnerability info if the service has finished
-        try {
-            const vulns: VulnsOutput = await this.vulnerabilitiesUtilsService.getVulnsResult(analysis_id);
-            // const vulnInfo = vulns.workspaces[workspace].DependencyInfo[dependency.key];
+        const vulns: VulnsOutput = await this.vulnerabilitiesUtilsService.getVulnsResult(analysis_id);
 
-            // dependency.combined_severity = vulnInfo.Vulnerabilities.map(
-            //     (depInfoVuln) => depInfoVuln.Severity.Severity
-            // ).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+        dependency_details.vulnerabilities = []
 
-            // dependency.vulnerable = vulnInfo.Vulnerable;
-
-            // dependency.vulnerabilities = vulnInfo.Vulnerabilities.map(
-            //     (depInfoVuln) => depInfoVuln.Vulnerability
-            // );
-
-            // dependency.combined_severity = vulnInfo.Vulnerabilities.map(
-            //     (depInfoVuln) => depInfoVuln.Severity.Severity
-            // ).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-
-            // dependency.vulnerable = vulnInfo.Vulnerable;
-
-            // dependency.vulnerabilities = vulnInfo.Vulnerabilities.map(
-            //     (depInfoVuln) => depInfoVuln.Vulnerability
-            // );
-
-            // if (vulnInfo.SeverityDist)
-            //     dependency.severity_dist = {
-            //         critical: vulnInfo.SeverityDist.critical,
-            //         high: vulnInfo.SeverityDist.high,
-            //         medium: vulnInfo.SeverityDist.medium,
-            //         low: vulnInfo.SeverityDist.low,
-            //         none: vulnInfo.SeverityDist.none
-            //     };
-            // else
-            //     dependency.severity_dist = {
-            //         critical: 0,
-            //         high: 0,
-            //         medium: 0,
-            //         low: 0,
-            //         none: 0
-            //     };
-        } catch (err) {
-            // Nothing to throw here
+        for (const vuln of vulns.workspaces['.'].Vulnerabilities) {
+            if (vuln.AffectedDependency == dependency_name && vuln.AffectedVersion == dependency_version) {
+                dependency_details.vulnerabilities.push(vuln.VulnerabilityId)
+                dependency_details.severity_dist.critical += vuln.Severity.SeverityClass == 'CRITICAL' ? 1 : 0
+                dependency_details.severity_dist.high += vuln.Severity.SeverityClass == 'HIGH' ? 1 : 0
+                dependency_details.severity_dist.medium += vuln.Severity.SeverityClass == 'MEDIUM' ? 1 : 0
+                dependency_details.severity_dist.low += vuln.Severity.SeverityClass == 'LOW' ? 1 : 0
+                dependency_details.severity_dist.none += vuln.Severity.SeverityClass == 'NONE' ? 1 : 0
+            }
         }
 
         return dependency_details;

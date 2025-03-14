@@ -56,7 +56,7 @@ export interface DependencyDetails {
     lastest_release_date: Date;
     // file_path!: string;
     vulnerabilities: string[];
-    // severity_dist!: SeverityDist;
+    severity_dist: SeverityDist;
     // mean_severity!: number;
     // combined_severity!: number;
     // patchable_paths!: string[];
