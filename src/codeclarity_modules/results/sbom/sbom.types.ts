@@ -44,7 +44,7 @@ export class SbomDependency {
 export interface DependencyDetails {
     name: string;
     version: string;
-    newest_release: string;
+    latest_version: string;
     dependencies: { [key: string]: string };
     dev_dependencies: { [key: string]: string };
     transitive: boolean;
@@ -52,36 +52,9 @@ export interface DependencyDetails {
     package_manager: string;
     license: string;
     engines: { [key: string]: string };
-    release: Date;
-    // parents!: string[];
-    // dependencies!: string[];
-    // optional_dependencies!: string[];
-    // peer_dependencies!: string[];
-    // bundled_dependencies!: string[];
-    // optional!: boolean;
-    // bundled!: boolean;
-    // peer!: boolean;
-    // scoped!: boolean;
-    // dev: boolean;
-    // link_type!: LinkType;
-    // version_type!: Enumerator;
-    // purl!: string;
-    // purl_no_version!: string;
-    // linked_git_url?: ParsedGitUrl;
-    // git_url?: ParsedGitUrl;
+    release_date: Date;
+    lastest_release_date: Date;
     // file_path!: string;
-    // is_package_managed!: boolean;
-    // is_self_managed!: boolean;
-    // is_direct!: boolean;
-    // is_transitive!: boolean;
-    // is_direct_count!: number;
-    // is_transitive_count!: number;
-    // is_prod_count!: number;
-    // is_dev_count!: number;
-    // licenses!: string[];
-    // non_spdx_licenses!: string[];
-    // package_manager!: string;
-    // vulnerable!: boolean;
     // vulnerabilities!: string[];
     // severity_dist!: SeverityDist;
     // mean_severity!: number;
@@ -89,12 +62,6 @@ export interface DependencyDetails {
     // patchable_paths!: string[];
     // patch_type!: string;
     // deprecated!: boolean;
-    // outdated!: boolean;
-    // unlicensed!: boolean;
-    // deprecated_message!: string;
-    // outdated_message!: string;
-    // version_age!: number;
-    // last_published!: Date;
 }
 
 interface WorkSpaceDependency {

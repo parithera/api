@@ -151,7 +151,7 @@ export async function getDependencyData(
     const dependency_details: DependencyDetails = {
         name: dependency_name,
         version: version.version,
-        newest_release: package_version.latest_version,
+        latest_version: package_version.latest_version,
         dependencies: version.dependencies,
         dev_dependencies: version.dev_dependencies,
         transitive: dependency.Transitive,
@@ -159,7 +159,8 @@ export async function getDependencyData(
         package_manager: sbom.analysis_info.package_manager,
         license: package_version.license,
         engines: version.extra.Engines,
-        release: version.extra.Time,
+        release_date: version.extra.Time,
+        lastest_release_date: package_version.time,
     };
 
     // dependency_details.transitive = dependency
