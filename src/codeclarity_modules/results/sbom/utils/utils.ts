@@ -158,7 +158,8 @@ export async function getDependencyData(
         source: package_version.source,
         package_manager: sbom.analysis_info.package_manager,
         license: package_version.license,
-        engines: version.extra.Engines
+        engines: version.extra.Engines,
+        release: version.extra.Time,
     };
 
     // dependency_details.transitive = dependency
