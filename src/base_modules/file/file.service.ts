@@ -95,7 +95,7 @@ export class FileService {
             // Write the file buffer to the file stream
             fileStream.write(file.buffer);
 
-            await new Promise((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 fileStream.end();  // This automatically calls resolve on finish
 
                 fileStream.on('finish', resolve);
@@ -110,7 +110,7 @@ export class FileService {
             // Write the file buffer to the file stream
             fileStream.write(file.buffer);
 
-            await new Promise((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 fileStream.end();  // This automatically calls resolve on finish
 
                 fileStream.on('finish', resolve);
@@ -168,7 +168,7 @@ export class FileService {
                     }
                 }
 
-                await new Promise((resolve, reject) => {
+                await new Promise<void>((resolve, reject) => {
                     finalFileStream.end();
                     finalFileStream.on('finish', resolve);
                     finalFileStream.on('error', reject);
