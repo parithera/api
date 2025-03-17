@@ -18,6 +18,5 @@
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "typeRoots": ["./typeDeclarations", "./cvss-parser-js/types"],
   }
 }

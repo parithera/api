@@ -1,4 +1,4 @@
-describe('LicensesController', () => {
+describe('ResultsController', () => {
     it('empty', () => {
       
     })

@@ -1,0 +1,6 @@
+describe('VulnerabilitiesController', () => {
+    it('empty', () => {
+      
+    })
+  });
+  

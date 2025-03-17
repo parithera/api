@@ -1,0 +1,6 @@
+describe('SbomController', () => {
+    it('empty', () => {
+      
+    })
+  });
+  

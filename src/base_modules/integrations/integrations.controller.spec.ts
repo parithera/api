@@ -1,0 +1,6 @@
+describe('IntegrationsController', () => {
+    it('empty', () => {
+      
+    })
+  });
+  
