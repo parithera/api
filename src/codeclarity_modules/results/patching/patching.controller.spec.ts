@@ -1,6 +1,3 @@
 describe('PatchingController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

@@ -1,14 +1,14 @@
-import { PublicAPIError } from "src/types/error.types";
+import { PublicAPIError } from 'src/types/error.types';
 
 export const errorMessages: { [key: string]: string } = {
     SetupAlreadyDone:
         'The requested action cannot be performed on the social account because it is already setup.',
     FailedToSendAccountRegistrationVerificationEmail:
         'An error occured while trying to send the account registration verficiation email.',
-            CannotPerformActionOnSocialAccount:
-                'The requested action cannot be performed on a social account.',
-            CannotPerformActionOnNormalAccount:
-                'The requested action cannot be performed on a normal account.',
+    CannotPerformActionOnSocialAccount:
+        'The requested action cannot be performed on a social account.',
+    CannotPerformActionOnNormalAccount:
+        'The requested action cannot be performed on a normal account.'
 };
 
 export class SetupAlreadyDone extends PublicAPIError {
@@ -38,8 +38,6 @@ export class FailedToSendAccountRegistrationVerificationEmail extends PublicAPIE
         );
     }
 }
-
-
 
 export class CannotPerformActionOnSocialAccount extends PublicAPIError {
     static errorCode = 'CannotPerformActionOnSocialAccount';

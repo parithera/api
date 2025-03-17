@@ -38,7 +38,7 @@ export class OrganizationLoggerService {
         organizationId: string,
         causedBy: string
     ): Promise<string> {
-        const user = await this.usersRepository.getUserById(causedBy)
+        const user = await this.usersRepository.getUserById(causedBy);
 
         const log = new Log();
         log.action = action;

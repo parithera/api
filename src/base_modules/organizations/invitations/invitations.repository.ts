@@ -1,8 +1,8 @@
-import { Repository } from "typeorm";
-import { Invitation } from "./invitation.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Injectable } from "@nestjs/common";
-import { EntityNotFound } from "src/types/error.types";
+import { Repository } from 'typeorm';
+import { Invitation } from './invitation.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
+import { EntityNotFound } from 'src/types/error.types';
 
 /**
  * Injectable service for handling invitations.
@@ -16,7 +16,7 @@ export class InvitationsRepository {
      */
     constructor(
         @InjectRepository(Invitation, 'codeclarity')
-        private readonly invitationRepository: Repository<Invitation>,
+        private readonly invitationRepository: Repository<Invitation>
     ) {}
 
     /**
@@ -46,7 +46,10 @@ export class InvitationsRepository {
      * @param userId - The ID of the user to filter by.
      * @returns A Promise that resolves to an array of Invitation entities.
      */
-    async getInvitationsByOrganizationAndUser(organizationId: string, userId: string): Promise<Invitation[]> {
+    async getInvitationsByOrganizationAndUser(
+        organizationId: string,
+        userId: string
+    ): Promise<Invitation[]> {
         const invitations = await this.invitationRepository.find({
             where: {
                 organization: { id: organizationId },

@@ -5,9 +5,7 @@ import { Plugin } from './plugin.entity';
 import { PluginsRepository } from './plugin.repository';
 @Injectable()
 export class PluginService {
-    constructor(
-        private readonly pluginsRepository: PluginsRepository
-    ) {}
+    constructor(private readonly pluginsRepository: PluginsRepository) {}
 
     /**
      * Get a plugin
@@ -15,7 +13,7 @@ export class PluginService {
      * @returns the plugin
      */
     async get(pluginId: string): Promise<Plugin> {
-        return this.pluginsRepository.getById(pluginId)
+        return this.pluginsRepository.getById(pluginId);
     }
 
     /**
@@ -23,6 +21,6 @@ export class PluginService {
      * @returns all plugins
      */
     async getAll(): Promise<Array<Plugin>> {
-        return this.pluginsRepository.getAll()
+        return this.pluginsRepository.getAll();
     }
 }

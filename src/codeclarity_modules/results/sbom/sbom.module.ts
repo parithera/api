@@ -21,18 +21,10 @@ import { LicenseModule } from '../licenses/licenses.module';
         forwardRef(() => VulnerabilitiesModule),
         forwardRef(() => LicenseModule),
         KnowledgeModule,
-        TypeOrmModule.forFeature(
-            [Result],
-            'codeclarity'
-        ),
+        TypeOrmModule.forFeature([Result], 'codeclarity')
     ],
     exports: [SBOMRepository, SbomUtilsService],
-    providers: [
-        SBOMService,
-        AnalysisResultsService,
-        SBOMRepository,
-        SbomUtilsService
-    ],
+    providers: [SBOMService, AnalysisResultsService, SBOMRepository, SbomUtilsService],
     controllers: [SBOMController]
 })
 export class SbomModule {}

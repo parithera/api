@@ -19,17 +19,9 @@ import { SbomModule } from '../sbom/sbom.module';
         forwardRef(() => AnalysesModule),
         KnowledgeModule,
         forwardRef(() => SbomModule),
-        TypeOrmModule.forFeature(
-            [Result],
-            'codeclarity'
-        )
+        TypeOrmModule.forFeature([Result], 'codeclarity')
     ],
-    providers: [
-        LicensesService,
-        AnalysisResultsService,
-        LicensesRepository,
-        LicensesUtilsService
-    ],
+    providers: [LicensesService, AnalysisResultsService, LicensesRepository, LicensesUtilsService],
     exports: [LicensesRepository, LicensesUtilsService],
     controllers: [LicensesController]
 })

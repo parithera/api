@@ -12,7 +12,7 @@ export class CWERepository {
     ) {}
 
     async getCWE(cweId: string): Promise<CWE> {
-        const cwe = await this.getCWEWithoutFailing(cweId)
+        const cwe = await this.getCWEWithoutFailing(cweId);
         if (!cwe) {
             throw new EntityNotFound();
         }

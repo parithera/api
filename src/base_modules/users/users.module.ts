@@ -15,13 +15,10 @@ import { ProjectsModule } from '../projects/projects.module';
         EmailModule,
         ProjectsModule,
         forwardRef(() => AuthModule),
-        TypeOrmModule.forFeature(
-            [User],
-            'codeclarity'
-        ),
+        TypeOrmModule.forFeature([User], 'codeclarity')
     ],
     exports: [UsersRepository, UsersService],
     providers: [UsersService, UsersRepository],
     controllers: [UsersController]
 })
-export class UsersModule { }
+export class UsersModule {}

@@ -1,6 +1,3 @@
 describe('AuthenticationController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

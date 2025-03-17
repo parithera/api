@@ -11,13 +11,10 @@ import { AnalyzersRepository } from './analyzers.repository';
     imports: [
         forwardRef(() => UsersModule),
         OrganizationsModule,
-        TypeOrmModule.forFeature(
-            [Analyzer],
-            'codeclarity'
-        )
+        TypeOrmModule.forFeature([Analyzer], 'codeclarity')
     ],
     exports: [AnalyzersService, AnalyzersRepository],
     providers: [AnalyzersService, AnalyzersRepository],
     controllers: [AnalyzersController]
 })
-export class AnalyzersModule { }
+export class AnalyzersModule {}

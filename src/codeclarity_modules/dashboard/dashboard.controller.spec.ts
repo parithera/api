@@ -1,6 +1,3 @@
 describe('DashboardController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

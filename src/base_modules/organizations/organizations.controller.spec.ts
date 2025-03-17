@@ -1,6 +1,3 @@
 describe('OrganizationsController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

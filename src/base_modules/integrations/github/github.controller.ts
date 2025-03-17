@@ -122,7 +122,9 @@ export class GithubIntegrationController {
         @Param('org_id') org_id: string,
         @Param('integration_id') integration_id: string
     ): Promise<NoDataResponse> {
-        const organization = await this.organizationsRepository.getOrganizationById(org_id, {integrations: true})
+        const organization = await this.organizationsRepository.getOrganizationById(org_id, {
+            integrations: true
+        });
         if (!organization) {
             throw new EntityNotFound();
         }

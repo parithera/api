@@ -22,19 +22,10 @@ import { VulnerabilitiesModule } from '../vulnerabilities/vulnerabilities.module
         forwardRef(() => VulnerabilitiesModule),
         EmailModule,
         SbomModule,
-        TypeOrmModule.forFeature(
-            [
-                Result
-            ],
-            'codeclarity'
-        )
+        TypeOrmModule.forFeature([Result], 'codeclarity')
     ],
     exports: [PatchingUtilsService],
-    providers: [
-        PatchingService,
-        AnalysisResultsService,
-        PatchingUtilsService
-    ],
+    providers: [PatchingService, AnalysisResultsService, PatchingUtilsService],
     controllers: [PatchingController]
 })
 export class PatchingModule {}

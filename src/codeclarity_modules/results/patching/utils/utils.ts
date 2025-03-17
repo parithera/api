@@ -11,11 +11,9 @@ export class PatchingUtilsService {
     constructor(
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>
-    ) { }
+    ) {}
 
-    async getPatchingResult(
-        analysis_id: string
-    ): Promise<PatchesOutput> {
+    async getPatchingResult(analysis_id: string): Promise<PatchesOutput> {
         const result = await this.resultRepository.findOne({
             relations: { analysis: true },
             where: {

@@ -12,10 +12,7 @@ import { Email } from 'src/base_modules/email/email.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [Email],
-            'codeclarity'
-        ),
+        TypeOrmModule.forFeature([Email], 'codeclarity'),
         MailerModule.forRootAsync({
             useFactory: (config: ConfigService) => ({
                 transport: {
@@ -54,4 +51,4 @@ import { Email } from 'src/base_modules/email/email.entity';
     exports: [EmailService, EmailRepository],
     controllers: [EmailUnsubscriptionController]
 })
-export class EmailModule { }
+export class EmailModule {}

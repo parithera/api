@@ -91,7 +91,7 @@ export class SBOMController {
             workspace,
             dependency,
             user
-        )
+        );
         return {
             data: data
         };

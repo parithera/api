@@ -15,14 +15,14 @@ export class PackageRepository {
         if (dependencyName.includes('/')) {
             dependencyName.replace('/', ':');
         }
-        const pack = await this.getPackageInfoWithoutFailing(dependencyName)
+        const pack = await this.getPackageInfoWithoutFailing(dependencyName);
         if (!pack) {
             throw new EntityNotFound();
         }
         return pack;
     }
 
-    async getPackageInfoWithoutFailing(dependencyName: string): Promise<Package|null> {
+    async getPackageInfoWithoutFailing(dependencyName: string): Promise<Package | null> {
         if (dependencyName.includes('/')) {
             dependencyName.replace('/', ':');
         }
@@ -33,7 +33,7 @@ export class PackageRepository {
         });
     }
 
-    async getVersionInfo(dependency_name:string, dependency_version: string): Promise<Package> {
+    async getVersionInfo(dependency_name: string, dependency_version: string): Promise<Package> {
         const package_version = await this.packageRepository.findOne({
             where: {
                 name: dependency_name,
@@ -47,7 +47,7 @@ export class PackageRepository {
         });
         if (!package_version) {
             throw new EntityNotFound();
-        }   
-        return package_version
+        }
+        return package_version;
     }
 }

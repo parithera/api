@@ -69,7 +69,12 @@ export class ProjectService {
         const project = new Project();
 
         if (projectData.integration_id) {
-            const integration = await this.integrationsRepository.getIntegrationByIdAndOrganizationAndUser(projectData.integration_id, orgId, user.userId)
+            const integration =
+                await this.integrationsRepository.getIntegrationByIdAndOrganizationAndUser(
+                    projectData.integration_id,
+                    orgId,
+                    user.userId
+                );
 
             let repo: RepositoryCache;
 
@@ -142,9 +147,9 @@ export class ProjectService {
             project.integration_provider = IntegrationProvider.FILE;
         }
 
-        const user_adding = await this.usersRepository.getUserById(user.userId)
+        const user_adding = await this.usersRepository.getUserById(user.userId);
 
-        const organization = await this.organizationsRepository.getOrganizationById(orgId)
+        const organization = await this.organizationsRepository.getOrganizationById(orgId);
 
         project.downloaded = false;
         project.added_on = new Date();
@@ -155,7 +160,7 @@ export class ProjectService {
 
         const added_project = await this.projectsRepository.saveProject(project);
 
-        const folderPath = join('/private', organization.id, "projects", added_project.id);
+        const folderPath = join('/private', organization.id, 'projects', added_project.id);
         await mkdir(folderPath, { recursive: true });
 
         await this.organizationLoggerService.addAuditLog(
@@ -187,15 +192,12 @@ export class ProjectService {
         );
 
         // (2) Check if project belongs to org
-        await this.projectMemberService.doesProjectBelongToOrg(
-            id,
-            organizationId
-        );
+        await this.projectMemberService.doesProjectBelongToOrg(id, organizationId);
 
-        return  this.projectsRepository.getProjectById(id,  {
+        return this.projectsRepository.getProjectById(id, {
             files: true,
             added_by: true
-        })
+        });
     }
 
     /**
@@ -238,7 +240,12 @@ export class ProjectService {
         if (paginationUserSuppliedConf.currentPage)
             currentPage = Math.max(0, paginationUserSuppliedConf.currentPage);
 
-        return this.projectsRepository.getManyProjects(orgId, currentPage, entriesPerPage, searchKey)
+        return this.projectsRepository.getManyProjects(
+            orgId,
+            currentPage,
+            entriesPerPage,
+            searchKey
+        );
     }
 
     /**
@@ -255,9 +262,9 @@ export class ProjectService {
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         // (2) Check if project belongs to org
-        await this.projectsRepository.doesProjectBelongToOrg(id, orgId)
+        await this.projectsRepository.doesProjectBelongToOrg(id, orgId);
 
-        const membership = await this.organizationsRepository.getMembershipRole(orgId, user.userId)
+        const membership = await this.organizationsRepository.getMembershipRole(orgId, user.userId);
 
         if (!membership) {
             throw new EntityNotFound();
@@ -268,7 +275,7 @@ export class ProjectService {
         const project = await this.projectsRepository.getProjectById(id, {
             files: true,
             added_by: true
-        })
+        });
 
         // Every moderator, admin or owner can remove a project.
         // a normal user can also delete it, iff he is the one that added the project
@@ -279,13 +286,15 @@ export class ProjectService {
             }
         }
 
-        const organization = await this.organizationsRepository.getOrganizationById(orgId, {projects:true})
+        const organization = await this.organizationsRepository.getOrganizationById(orgId, {
+            projects: true
+        });
         organization.projects = organization.projects.filter((p) => p.id != id);
         await this.organizationsRepository.saveOrganization(organization);
 
         const analyses = await this.analysesRepository.getAnalysesByProjectId(project.id, {
             results: true
-        })
+        });
         for (const analysis of analyses) {
             for (const result of analysis.results) {
                 await this.resultsRepository.remove(result);
@@ -295,13 +304,13 @@ export class ProjectService {
         }
 
         // Remove project folder
-        const filePath = join('/private', organization.id, "projects", project.id);
+        const filePath = join('/private', organization.id, 'projects', project.id);
         if (existsSync(filePath)) {
-            await rm(filePath, {recursive: true, force: true});
+            await rm(filePath, { recursive: true, force: true });
         }
 
         for (const file of project.files) {
-            await this.fileRepository.remove(file)
+            await this.fileRepository.remove(file);
         }
 
         await this.projectsRepository.deleteProject(id);

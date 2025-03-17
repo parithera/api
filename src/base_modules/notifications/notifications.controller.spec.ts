@@ -1,6 +1,3 @@
 describe('NotificationsController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

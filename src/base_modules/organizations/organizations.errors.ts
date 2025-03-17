@@ -1,4 +1,4 @@
-import { PublicAPIError } from "src/types/error.types";
+import { PublicAPIError } from 'src/types/error.types';
 
 export const errorMessages: { [key: string]: string } = {
     InvitationOrgAlreadyExists:

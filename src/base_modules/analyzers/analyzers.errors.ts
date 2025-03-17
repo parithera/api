@@ -3,7 +3,7 @@ import { PublicAPIError } from 'src/types/error.types';
 export const errorMessages: { [key: string]: string } = {
     AnalyzerDoesNotExist: 'The analyzer referenced does not exist.',
     AnaylzerMissingConfigAttribute:
-        'A required configuration attribute to run an anylzer is missing.',
+        'A required configuration attribute to run an anylzer is missing.'
 };
 export class AnalyzerDoesNotExist extends PublicAPIError {
     static errorCode = 'AnalyzerDoesNotExist';

@@ -29,7 +29,7 @@ const fs = require('fs');
             publicKey: fs.readFileSync('./jwt/public.pem', 'utf8'),
             privateKey: fs.readFileSync('./jwt/private.pem', 'utf8'),
             signOptions: { expiresIn: CONST_JWT_TOKEN_EXPIRES_IN, algorithm: CONST_JWT_ALGORITHM }
-        }),
+        })
     ],
     providers: [
         AuthService,

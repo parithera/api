@@ -17,10 +17,7 @@ import { Result } from 'src/codeclarity_modules/results/result.entity';
         SbomModule,
         PatchingModule,
         LicenseModule,
-        TypeOrmModule.forFeature(
-            [Result],
-            'codeclarity'
-        ),
+        TypeOrmModule.forFeature([Result], 'codeclarity')
     ],
     exports: [AnalysisResultsRepository],
     providers: [AnalysisResultsRepository]

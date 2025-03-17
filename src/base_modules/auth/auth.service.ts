@@ -34,7 +34,7 @@ export class AuthService {
         private gitlabIntegrationTokenService: GitlabIntegrationTokenService,
         private userService: UsersService,
         @Inject(forwardRef(() => UsersRepository))
-        private readonly usersRepository: UsersRepository,
+        private readonly usersRepository: UsersRepository
     ) {}
 
     /**
@@ -48,7 +48,7 @@ export class AuthService {
      * @returns A JWT and Refresh token
      */
     async authenticate(email: string, password: string): Promise<TokenResponse> {
-        const user = await this.usersRepository.getUserByEmail(email)
+        const user = await this.usersRepository.getUserByEmail(email);
 
         if (!user) {
             throw new WrongCredentials();
@@ -185,7 +185,7 @@ export class AuthService {
     async getAuthenticatedUser(authenticatedUser: AuthenticatedUser): Promise<User> {
         const user = await this.usersRepository.getUserById(authenticatedUser.userId, {
             default_org: true
-        })
+        });
         if (!user) {
             throw new EntityNotFound();
         }
@@ -203,7 +203,7 @@ export class AuthService {
             throw new FailedToAuthenticateSocialAccount();
         }
 
-        const user = await this.usersRepository.getUserByEmail(githubUser.email)
+        const user = await this.usersRepository.getUserByEmail(githubUser.email);
         if (!user) {
             throw new FailedToAuthenticateSocialAccount();
         }
@@ -221,7 +221,7 @@ export class AuthService {
             throw new FailedToAuthenticateSocialAccount();
         }
 
-        const user = await this.usersRepository.getUserByEmail(gitlabUser.email)
+        const user = await this.usersRepository.getUserByEmail(gitlabUser.email);
         if (!user) {
             throw new FailedToAuthenticateSocialAccount();
         }
@@ -330,7 +330,7 @@ export class AuthService {
         email: string,
         password: string
     ): Promise<[boolean, User | undefined]> {
-        const user = await this.usersRepository.getUserByEmail(email)
+        const user = await this.usersRepository.getUserByEmail(email);
 
         if (!user) {
             return [false, undefined];

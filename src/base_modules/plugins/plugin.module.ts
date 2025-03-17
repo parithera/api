@@ -23,4 +23,4 @@ import { PluginsRepository } from './plugin.repository';
     providers: [PluginService, PluginsRepository],
     controllers: [PluginController]
 })
-export class PluginModule { }
+export class PluginModule {}

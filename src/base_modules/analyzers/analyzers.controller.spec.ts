@@ -1,6 +1,3 @@
 describe('AnalyzersController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

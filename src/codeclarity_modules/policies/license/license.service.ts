@@ -21,7 +21,7 @@ export class LicensePolicyService {
         private readonly organizationsRepository: OrganizationsRepository,
         private readonly usersRepository: UsersRepository,
         @InjectRepository(Policy, 'codeclarity')
-        private policyRepository: Repository<Policy>,
+        private policyRepository: Repository<Policy>
     ) {}
 
     /**
@@ -39,12 +39,12 @@ export class LicensePolicyService {
         // Only owners and admins can add an policy to the org
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.ADMIN);
 
-        const organization = await this.organizationsRepository.getOrganizationById(orgId)
+        const organization = await this.organizationsRepository.getOrganizationById(orgId);
         if (!organization) {
             throw new Error('EntityNotFound');
         }
 
-        const creator = await this.usersRepository.getUserById(user.userId)
+        const creator = await this.usersRepository.getUserById(user.userId);
         if (!creator) {
             throw new Error('EntityNotFound');
         }

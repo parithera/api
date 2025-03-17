@@ -224,17 +224,17 @@ export interface AffectedVuln {
 }
 
 interface Semver {
-    Major: number,
-    Minor: number,
-    Patch: number,
-    PreReleaseTag: string,
-    MetaData: string
+    Major: number;
+    Minor: number;
+    Patch: number;
+    PreReleaseTag: string;
+    MetaData: string;
 }
 
 interface Exact {
-    CPEInfo: any,
-    VersionSemver: Semver,
-    VersionString: string
+    CPEInfo: any;
+    VersionSemver: Semver;
+    VersionString: string;
 }
 
 export declare interface AffectedRange {

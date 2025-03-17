@@ -4,12 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Notification } from './notification.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [Notification],
-            'codeclarity'
-        )
-    ],
+    imports: [TypeOrmModule.forFeature([Notification], 'codeclarity')],
     controllers: [NotificationsController]
 })
-export class NotificationsModule { }
+export class NotificationsModule {}

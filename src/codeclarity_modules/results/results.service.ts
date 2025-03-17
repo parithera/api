@@ -33,9 +33,6 @@ export class AnalysisResultsService {
         await this.projectMemberService.doesProjectBelongToOrg(projectId, orgId);
 
         // (3) Check if the analyses belongs to the project
-        await this.analysesRepository.doesAnalysesBelongToProject(
-            analysisId,
-            projectId
-        );
+        await this.analysesRepository.doesAnalysesBelongToProject(analysisId, projectId);
     }
 }

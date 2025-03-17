@@ -25,20 +25,10 @@ import { ProjectsRepository } from './projects.repository';
         GitlabModule,
         forwardRef(() => AnalysesModule),
         forwardRef(() => ResultsModule),
-        TypeOrmModule.forFeature(
-            [
-                Project,
-                RepositoryCache
-            ],
-            'codeclarity'
-        ),
+        TypeOrmModule.forFeature([Project, RepositoryCache], 'codeclarity')
     ],
     exports: [ProjectService, ProjectMemberService, ProjectsRepository],
-    providers: [
-        ProjectsRepository,
-        ProjectMemberService,
-        ProjectService
-    ],
+    providers: [ProjectsRepository, ProjectMemberService, ProjectService],
     controllers: [ProjectController]
 })
-export class ProjectsModule { }
+export class ProjectsModule {}

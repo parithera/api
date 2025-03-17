@@ -1,6 +1,3 @@
 describe('ProjectsController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

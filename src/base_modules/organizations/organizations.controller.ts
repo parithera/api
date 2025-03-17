@@ -82,7 +82,7 @@ export class OrganizationsController {
     async get(
         @AuthUser() user: AuthenticatedUser,
         @Param('organization_id') organization_id: string
-    ): Promise<TypedResponse<Object>> {
+    ): Promise<TypedResponse<object>> {
         return { data: await this.organizationsService.get(organization_id, user) };
     }
 
@@ -111,7 +111,7 @@ export class OrganizationsController {
         @Query('search_key') search_key?: string,
         @Query('sort_key') sort_key?: string,
         @Query('sort_direction') sort_direction?: SortDirection
-    ): Promise<TypedPaginatedResponse<Object>> {
+    ): Promise<TypedPaginatedResponse<object>> {
         return await this.organizationsService.getMany(
             { currentPage: page, entriesPerPage: entries_per_page },
             user,

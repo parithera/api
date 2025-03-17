@@ -45,7 +45,10 @@ export class FileService {
         );
 
         // Retrieve the project by ID and organization ID
-        const project = await this.projectsRepository.getProjectByIdAndOrganization(project_id, organization_id);
+        const project = await this.projectsRepository.getProjectByIdAndOrganization(
+            project_id,
+            organization_id
+        );
 
         // Escape the project ID to prevent any potential issues with file paths
         const escapeProjectId = escapeString(project_id);
@@ -63,17 +66,17 @@ export class FileService {
 
         // Escape the file name to prevent any potential issues with file paths
         const escapedFileName = escapeString(queryParams.file_name);
-        const baseName = escapedFileName.split(".", 1)[0];
+        const baseName = escapedFileName.split('.', 1)[0];
         // Pad the id with zeros until it is 5 characters long
         const paddedId = queryParams.id.toString().padStart(5, '0');
         const fileNameWithSuffix = `${baseName}.part${paddedId}`;
 
         // If this is not the last chunk of the file
-        if (queryParams.last == "false") {
+        if (queryParams.last == 'false') {
             const filePath = join(folderPath, fileNameWithSuffix); // Define the file path
 
             // Create a write stream for appending to the file
-            const fileStream = fs.createWriteStream(filePath, { flags: "a+" });
+            const fileStream = fs.createWriteStream(filePath, { flags: 'a+' });
 
             // Handle errors during writing or opening the file
             fileStream.on('error', (err) => {
@@ -83,11 +86,13 @@ export class FileService {
             if (file.buffer) {
                 await crypto.subtle.digest('SHA-256', file.buffer).then((hash) => {
                     const hashArray = Array.from(new Uint8Array(hash));
-                    const stringHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    const stringHash = hashArray
+                        .map((b) => b.toString(16).padStart(2, '0'))
+                        .join('');
                     if (queryParams.hash != stringHash) {
-                        console.error("NOT THE SAME HASH!");
+                        console.error('NOT THE SAME HASH!');
                         console.error('Hash:', stringHash);
-                        console.error('Original Hash:', queryParams.hash)
+                        console.error('Original Hash:', queryParams.hash);
                     }
                 });
             }
@@ -96,7 +101,7 @@ export class FileService {
             fileStream.write(file.buffer);
 
             await new Promise<void>((resolve, reject) => {
-                fileStream.end();  // This automatically calls resolve on finish
+                fileStream.end(); // This automatically calls resolve on finish
 
                 fileStream.on('finish', resolve);
                 fileStream.on('error', reject);
@@ -105,13 +110,13 @@ export class FileService {
             const filePath = join(folderPath, fileNameWithSuffix); // Define the file path
 
             // Create a write stream for appending to the file
-            const fileStream = fs.createWriteStream(filePath, { flags: "a+" });
+            const fileStream = fs.createWriteStream(filePath, { flags: 'a+' });
 
             // Write the file buffer to the file stream
             fileStream.write(file.buffer);
 
             await new Promise<void>((resolve, reject) => {
-                fileStream.end();  // This automatically calls resolve on finish
+                fileStream.end(); // This automatically calls resolve on finish
 
                 fileStream.on('finish', resolve);
                 fileStream.on('error', reject);
@@ -123,8 +128,9 @@ export class FileService {
             // Remove any files that don't match the expected pattern (e.g., .part01)
             const validFiles = [];
             for (const file of files) {
-                if (/\.part\d{5}$/.test(file)) {  // Check if the file does not have a .partXX extension
-                    validFiles.push(file);  // Add to list but do not delete from disk
+                if (/\.part\d{5}$/.test(file)) {
+                    // Check if the file does not have a .partXX extension
+                    validFiles.push(file); // Add to list but do not delete from disk
                 }
             }
 
@@ -145,7 +151,7 @@ export class FileService {
                 const finalFilePath = join(folderPath, escapedFileName); // Define the final file path
 
                 // Create a write stream for appending to the final file
-                const finalFileStream = fs.createWriteStream(finalFilePath, { flags: "a+" });
+                const finalFileStream = fs.createWriteStream(finalFilePath, { flags: 'a+' });
 
                 // Handle errors during writing or opening the file
                 finalFileStream.on('error', (err) => {
@@ -177,7 +183,7 @@ export class FileService {
         }
 
         // If this is not a chunked upload or if it's the last chunk
-        if (queryParams.chunk == "false" || queryParams.last == "true") {
+        if (queryParams.chunk == 'false' || queryParams.last == 'true') {
             // Save the file to the database
             const file_entity = new FileEntity();
             file_entity.added_by = added_by;
@@ -212,7 +218,10 @@ export class FileService {
         );
 
         // Retrieve the project by ID and organization ID
-        const project = await this.projectsRepository.getProjectByIdAndOrganization(project_id, organization_id);
+        const project = await this.projectsRepository.getProjectByIdAndOrganization(
+            project_id,
+            organization_id
+        );
 
         // Escape the project ID to prevent any potential issues with file paths
         const escapeProjectId = escapeString(project_id);

@@ -10,8 +10,7 @@ import { VulnerabilityMerged } from 'src/codeclarity_modules/results/vulnerabili
 
 @Injectable()
 export class VulnerabilitiesFilterService {
-    constructor(
-    ) { }
+    constructor() {}
 
     filter(
         vulnerabilities: VulnerabilityMerged[],
@@ -230,7 +229,8 @@ export class VulnerabilitiesFilterService {
                 }
                 if (filters.includes('integrity_impact')) {
                     if (
-                        (vulnerability.Severity && vulnerability.Severity.IntegrityImpact == 'NONE') ||
+                        (vulnerability.Severity &&
+                            vulnerability.Severity.IntegrityImpact == 'NONE') ||
                         vulnerability.Severity.IntegrityImpact == ''
                     )
                         continue;

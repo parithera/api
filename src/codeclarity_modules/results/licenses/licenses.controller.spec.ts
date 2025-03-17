@@ -1,6 +1,3 @@
 describe('LicensesController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

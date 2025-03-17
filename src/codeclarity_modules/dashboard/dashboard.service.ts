@@ -31,7 +31,7 @@ export class DashboardService {
         private readonly organizationsRepository: OrganizationsRepository,
         @InjectRepository(Organization, 'codeclarity')
         private organizationRepository: Repository<Organization>
-    ) { }
+    ) {}
 
     /**
      * Returns the severity info for all projects and their most recent analysis

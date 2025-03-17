@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-    EntityNotFound,
-    UserDoesNotExist,
-} from 'src/types/error.types';
+import { EntityNotFound, UserDoesNotExist } from 'src/types/error.types';
 import { User } from 'src/base_modules/users/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,8 +15,8 @@ export class UsersRepository {
         private readonly organizationsRepository: OrganizationsRepository,
         private readonly projectsRepository: ProjectsRepository,
         @InjectRepository(User, 'codeclarity')
-        private userRepository: Repository<User>,
-    ) { }
+        private userRepository: Repository<User>
+    ) {}
 
     /**
      * Return the user with the given id.
@@ -30,8 +27,7 @@ export class UsersRepository {
      */
     async getUserById(userId: string, relations?: object): Promise<User> {
         const user = await this.userRepository.findOne({
-            where:
-                { id: userId },
+            where: { id: userId },
             relations: relations
         });
 
@@ -62,12 +58,12 @@ export class UsersRepository {
     }
 
     async saveUser(user: User): Promise<User> {
-        return this.userRepository.save(user)
+        return this.userRepository.save(user);
     }
 
     async deleteUser(userId: string) {
-        await this.organizationsRepository.removeUserMemberships(userId)
-        await this.projectsRepository.deleteUserProjects(userId)
-        await this.userRepository.delete(userId)
+        await this.organizationsRepository.removeUserMemberships(userId);
+        await this.projectsRepository.deleteUserProjects(userId);
+        await this.userRepository.delete(userId);
     }
 }

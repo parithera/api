@@ -4,8 +4,7 @@ import { VulnerabilityMerged } from 'src/codeclarity_modules/results/vulnerabili
 
 @Injectable()
 export class VulnerabilitiesSortService {
-    constructor(
-    ) { }
+    constructor() {}
 
     sort(
         vulnerabilities: VulnerabilityMerged[],
@@ -182,5 +181,4 @@ export class VulnerabilitiesSortService {
 
         return sorted;
     }
-
 }

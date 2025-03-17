@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-    EntityNotFound,
-    NotAuthorized,
-} from 'src/types/error.types';
+import { EntityNotFound, NotAuthorized } from 'src/types/error.types';
 import { TypedPaginatedData } from 'src/types/pagination.types';
 import { Analysis } from 'src/base_modules/analyses/analysis.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,8 +16,8 @@ export class AnalysesRepository {
      */
     constructor(
         @InjectRepository(Analysis, 'codeclarity')
-        private analysisRepository: Repository<Analysis>,
-    ) { }
+        private analysisRepository: Repository<Analysis>
+    ) {}
 
     /**
      * Saves an analysis to the database.
@@ -28,7 +25,7 @@ export class AnalysesRepository {
      * @returns A promise that resolves with the saved analysis.
      */
     async saveAnalysis(analysis: Analysis): Promise<Analysis> {
-        return await this.analysisRepository.save(analysis)
+        return await this.analysisRepository.save(analysis);
     }
 
     /**
@@ -36,7 +33,7 @@ export class AnalysesRepository {
      * @param analysisId The ID of the analysis to be deleted.
      */
     async deleteAnalysis(analysisId: string) {
-        await this.analysisRepository.delete(analysisId)
+        await this.analysisRepository.delete(analysisId);
     }
 
     /**
@@ -44,7 +41,7 @@ export class AnalysesRepository {
      * @param analysisId The ID of the analysis to be deleted.
      */
     async removeAnalyses(analyses: Analysis[]) {
-        await this.analysisRepository.remove(analyses)
+        await this.analysisRepository.remove(analyses);
     }
 
     /**
@@ -59,12 +56,12 @@ export class AnalysesRepository {
                 id: analysisId
             },
             relations: relation
-        })
+        });
         if (!analysis) {
-            throw new EntityNotFound()
+            throw new EntityNotFound();
         }
 
-        return analysis
+        return analysis;
     }
 
     /**
@@ -74,7 +71,11 @@ export class AnalysesRepository {
      * @param entriesPerPage The number of entries per page.
      * @returns A promise that resolves with a paginated data object containing the list of analyses and pagination metadata.
      */
-    async getAnalysisByProjectId(projectId: string, currentPage: number, entriesPerPage: number): Promise<TypedPaginatedData<Analysis>> {
+    async getAnalysisByProjectId(
+        projectId: string,
+        currentPage: number,
+        entriesPerPage: number
+    ): Promise<TypedPaginatedData<Analysis>> {
         const analysisQueryBuilder = this.analysisRepository
             .createQueryBuilder('analysis')
             .orderBy('analysis.created_on', 'DESC')
@@ -102,7 +103,7 @@ export class AnalysesRepository {
     async getAnalysesByProjectId(projectId: string, relations?: object): Promise<Analysis[]> {
         return this.analysisRepository.find({
             where: {
-                project: {id: projectId}
+                project: { id: projectId }
             },
             relations: relations
         });

@@ -1,6 +1,3 @@
 describe('ApiKeysController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

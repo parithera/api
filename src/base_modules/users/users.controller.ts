@@ -7,12 +7,7 @@ import { NonAuthEndpoint } from 'src/decorators/SkipAuthDecorator';
 import { ApiTags } from '@nestjs/swagger';
 import { APIDocTypedResponseDecorator } from 'src/decorators/TypedResponse';
 import { ApiErrorDecorator } from 'src/decorators/ApiException';
-import {
-    EntityNotFound,
-    InternalError,
-    NotAuthorized,
-    Unsupported
-} from 'src/types/error.types';
+import { EntityNotFound, InternalError, NotAuthorized, Unsupported } from 'src/types/error.types';
 import { APIDocNoDataResponseDecorator } from 'src/decorators/NoDataResponse';
 import { APIDocCreatedResponseDecorator } from 'src/decorators/CrudResponse';
 import {
@@ -25,8 +20,16 @@ import {
     UserPatchBody
 } from 'src/base_modules/users/user.types';
 import { User } from 'src/base_modules/users/users.entity';
-import { SetupAlreadyDone, FailedToSendAccountRegistrationVerificationEmail, CannotPerformActionOnNormalAccount, CannotPerformActionOnSocialAccount } from './users.errors';
-import { AccountRegistrationVerificationTokenInvalidOrExpired, PasswordsDoNotMatch } from '../auth/auth.errors';
+import {
+    SetupAlreadyDone,
+    FailedToSendAccountRegistrationVerificationEmail,
+    CannotPerformActionOnNormalAccount,
+    CannotPerformActionOnSocialAccount
+} from './users.errors';
+import {
+    AccountRegistrationVerificationTokenInvalidOrExpired,
+    PasswordsDoNotMatch
+} from '../auth/auth.errors';
 
 @Controller('users')
 export class UsersController {

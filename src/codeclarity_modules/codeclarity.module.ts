@@ -31,7 +31,7 @@ import { defaultOptions } from 'src/app.module';
                 autoLoadEntities: true,
                 database: 'codeclarity'
             })
-        }),
+        })
     ]
 })
-export class CodeClarityModule { }
+export class CodeClarityModule {}

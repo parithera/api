@@ -8,46 +8,46 @@ import { EntityNotFound } from 'src/types/error.types';
 export class AnalysisResultsRepository {
     constructor(
         @InjectRepository(Result, 'codeclarity')
-        private resultRepository: Repository<Result>,
-    ) { }
+        private resultRepository: Repository<Result>
+    ) {}
 
     async delete(resultId: string) {
-        await this.resultRepository.delete(resultId)
+        await this.resultRepository.delete(resultId);
     }
 
     async remove(result: Result) {
-        await this.resultRepository.remove(result)
+        await this.resultRepository.remove(result);
     }
 
     async removeResults(result: Result[]) {
-        await this.resultRepository.remove(result)
+        await this.resultRepository.remove(result);
     }
 
     async getByAnalysisId(analysisId: string, relations?: object): Promise<Result> {
         const analysis = await this.resultRepository.findOne({
             where: {
-                analysis: {id: analysisId},
+                analysis: { id: analysisId }
             },
             relations: relations
-        })
+        });
 
         if (!analysis) {
-            throw new EntityNotFound()
+            throw new EntityNotFound();
         }
 
-        return analysis
+        return analysis;
     }
 
     async getByAnalysisIdAndPluginType(analysisId: string, plugin: string, relations?: object) {
         const analysis = await this.resultRepository.findOne({
             where: {
-                analysis: {id: analysisId},
+                analysis: { id: analysisId },
                 plugin: plugin
             },
             relations: relations
-        })
+        });
 
-        return analysis
+        return analysis;
     }
 
     async resultOfAnalysisReady(analysysId: string): Promise<boolean> {

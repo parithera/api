@@ -20,7 +20,7 @@ import { LogsRepository } from './log/logs.repository';
         TypeOrmModule.forFeature(
             [OrganizationMemberships, Organization, Log, Invitation],
             'codeclarity'
-        ),
+        )
     ],
     exports: [OrganizationsRepository, OrganizationLoggerService],
     providers: [
@@ -32,4 +32,4 @@ import { LogsRepository } from './log/logs.repository';
     ],
     controllers: [OrganizationsController]
 })
-export class OrganizationsModule { }
+export class OrganizationsModule {}

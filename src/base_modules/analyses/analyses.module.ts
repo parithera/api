@@ -23,19 +23,10 @@ import { AnalysesRepository } from './analyses.repository';
         forwardRef(() => SbomModule),
         forwardRef(() => LicenseModule),
         forwardRef(() => VulnerabilitiesModule),
-        TypeOrmModule.forFeature(
-            [Analysis],
-            'codeclarity'
-        )
+        TypeOrmModule.forFeature([Analysis], 'codeclarity')
     ],
-    exports: [
-        AnalysesService,
-        AnalysesRepository
-    ],
-    providers: [
-        AnalysesService,
-        AnalysesRepository
-    ],
+    exports: [AnalysesService, AnalysesRepository],
+    providers: [AnalysesService, AnalysesRepository],
     controllers: [AnalysesController]
 })
-export class AnalysesModule { }
+export class AnalysesModule {}

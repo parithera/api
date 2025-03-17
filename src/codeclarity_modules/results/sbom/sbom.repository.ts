@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import {
-    Output as SBOMOutput,
-    Status,
-} from 'src/codeclarity_modules/results/sbom/sbom.types';
-import { PluginFailed, PluginResultNotAvailable} from 'src/types/error.types';
+import { Output as SBOMOutput, Status } from 'src/codeclarity_modules/results/sbom/sbom.types';
+import { PluginFailed, PluginResultNotAvailable } from 'src/types/error.types';
 import { Result } from 'src/codeclarity_modules/results/result.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,12 +9,10 @@ import { Repository } from 'typeorm';
 export class SBOMRepository {
     constructor(
         @InjectRepository(Result, 'codeclarity')
-        private resultRepository: Repository<Result>,
-    ) { }
+        private resultRepository: Repository<Result>
+    ) {}
 
-    async getSbomResult(
-        analysis_id: string
-    ): Promise<SBOMOutput> {
+    async getSbomResult(analysis_id: string): Promise<SBOMOutput> {
         const result = await this.resultRepository.findOne({
             relations: { analysis: true },
             where: {

@@ -1,6 +1,3 @@
 describe('ResultsController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

@@ -21,7 +21,7 @@ export const defaultOptions: PostgresConnectionOptions = {
     username: user,
     password: password,
     synchronize: true,
-    logging: false,
+    logging: false
     // dropSchema: true
 };
 
@@ -49,7 +49,7 @@ export const defaultOptions: PostgresConnectionOptions = {
         // Module for handling CodeClarity-related functionality, including SBOM and vulnerability reporting.
         CodeClarityModule,
         // Enterprise module that extends the platform's functionality with additional features.
-        EnterpriseModule,
+        EnterpriseModule
     ]
 })
-export class AppModule { }
+export class AppModule {}

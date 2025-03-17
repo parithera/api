@@ -1,6 +1,3 @@
 describe('UsersController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

@@ -8,10 +8,7 @@ import { Policy } from './policy.entity';
     imports: [
         LicensePolicyModule,
         DependencyPatchPolicyModule,
-        TypeOrmModule.forFeature(
-            [Policy],
-            'codeclarity'
-        ),
+        TypeOrmModule.forFeature([Policy], 'codeclarity')
     ]
 })
-export class PolicyModule { }
+export class PolicyModule {}

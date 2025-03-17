@@ -17,7 +17,10 @@ import {
     AlreadyExists,
     FailedToAuthenticateSocialAccount
 } from 'src/types/error.types';
-import { GitlabUserResponse, TokenResGitlabResponse } from 'src/base_modules/integrations/github.types';
+import {
+    GitlabUserResponse,
+    TokenResGitlabResponse
+} from 'src/base_modules/integrations/github.types';
 import { GitlabIntegrationTokenService } from '../integrations/gitlab/gitlabToken.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiErrorDecorator } from 'src/decorators/ApiException';

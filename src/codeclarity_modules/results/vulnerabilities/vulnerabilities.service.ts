@@ -19,7 +19,10 @@ import { UnknownWorkspace } from 'src/types/error.types';
 import { Output as SBOMOutput } from 'src/codeclarity_modules/results/sbom/sbom.types';
 import { Output as VulnsOutput } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
 import { StatusResponse } from 'src/codeclarity_modules/results/status.types';
-import { AnalysisStats, newAnalysisStats } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities2.types';
+import {
+    AnalysisStats,
+    newAnalysisStats
+} from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities2.types';
 import { VulnerabilitiesUtilsService } from './utils/utils.service';
 import { VulnerabilitiesSortService } from './utils/sort.service';
 import { VulnerabilitiesFilterService } from './utils/filter.service';
@@ -38,8 +41,8 @@ export class VulnerabilitiesService {
         private readonly sbomUtilsService: SbomUtilsService,
         private readonly osvRepository: OSVRepository,
         private readonly nvdRepository: NVDRepository,
-        private readonly cweRepository: CWERepository,
-    ) { }
+        private readonly cweRepository: CWERepository
+    ) {}
 
     async getStats(
         orgId: string,
@@ -491,13 +494,15 @@ export class VulnerabilitiesService {
             let osvSummary = '';
 
             if (isCve) {
-                const nvd = await this.nvdRepository.getVulnWithoutFailing(finding.Vulnerability)
+                const nvd = await this.nvdRepository.getVulnWithoutFailing(finding.Vulnerability);
 
                 if (nvd) {
                     nvdDescription = nvd.descriptions[0].value;
                 }
 
-                const osv = await this.osvRepository.getVulnByCVEIDWithoutFailing(finding.Vulnerability)
+                const osv = await this.osvRepository.getVulnByCVEIDWithoutFailing(
+                    finding.Vulnerability
+                );
 
                 if (osv) {
                     osvDescription = osv.details;
@@ -506,7 +511,9 @@ export class VulnerabilitiesService {
             }
 
             if (isGhsa) {
-                const osv = await this.osvRepository.getVulnByOSVIDWithoutFailing(finding.Vulnerability)
+                const osv = await this.osvRepository.getVulnByOSVIDWithoutFailing(
+                    finding.Vulnerability
+                );
 
                 if (osv) {
                     osvDescription = osv.details;
@@ -533,7 +540,9 @@ export class VulnerabilitiesService {
             // Attach weakness info
             if (finding.Weaknesses) {
                 for (const weakness of finding.Weaknesses) {
-                    const cwe = await this.cweRepository.getCWEWithoutFailing(weakness.WeaknessId.replace('CWE-', ''))
+                    const cwe = await this.cweRepository.getCWEWithoutFailing(
+                        weakness.WeaknessId.replace('CWE-', '')
+                    );
 
                     if (cwe) {
                         weakness.WeaknessName = cwe.name;

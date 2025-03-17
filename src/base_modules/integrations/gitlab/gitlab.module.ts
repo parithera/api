@@ -7,16 +7,9 @@ import { OrganizationsModule } from 'src/base_modules/organizations/organization
 import { IntegrationsModule } from '../integrations.module';
 
 @Module({
-    imports: [
-        OrganizationsModule,
-        forwardRef(() => IntegrationsModule)
-    ],
-    exports:[GitlabRepositoriesService],
-    providers: [
-        GitlabIntegrationService,
-        GitlabRepositoriesService,
-        GitlabIntegrationTokenService,
-    ],
+    imports: [OrganizationsModule, forwardRef(() => IntegrationsModule)],
+    exports: [GitlabRepositoriesService],
+    providers: [GitlabIntegrationService, GitlabRepositoriesService, GitlabIntegrationTokenService],
     controllers: [GitlabIntegrationController]
 })
 export class GitlabModule {}

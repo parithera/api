@@ -10,7 +10,10 @@ import {
     SeverityInfo,
     OtherInfo
 } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities2.types';
-import { Vulnerability, AffectedInfo } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
+import {
+    Vulnerability,
+    AffectedInfo
+} from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
 import { getVersionsSatisfyingConstraint } from 'src/codeclarity_modules/results/utils/utils';
 import { satisfies } from 'semver';
 import { VersionsRepository } from 'src/codeclarity_modules/knowledge/package/packageVersions.repository';
@@ -149,42 +152,39 @@ abstract class BaseReportGenerator {
 
     async getVulnerableVersionsString(source: string): Promise<string> {
         let affectedData: AffectedInfo = { Ranges: [], Exact: [], Universal: false };
-        if (source == 'NVD')
-            affectedData = this.vulnsData.NVDMatch.AffectedInfo[0];
-        else
-            affectedData = this.vulnsData.OSVMatch.AffectedInfo[0];
+        if (source == 'NVD') affectedData = this.vulnsData.NVDMatch.AffectedInfo[0];
+        else affectedData = this.vulnsData.OSVMatch.AffectedInfo[0];
 
         const affectedStringParts: string[] = [];
 
         if (affectedData.Ranges && affectedData.Ranges.length > 0) {
             for (const range of affectedData.Ranges) {
                 let affectedStringPart = '';
-                affectedStringPart += `>= ${range.IntroducedSemver.Major}.${range.IntroducedSemver.Minor}.${range.IntroducedSemver.Patch}`
+                affectedStringPart += `>= ${range.IntroducedSemver.Major}.${range.IntroducedSemver.Minor}.${range.IntroducedSemver.Patch}`;
                 if (range.IntroducedSemver.PreReleaseTag != '')
                     affectedStringPart += `-${range.IntroducedSemver.PreReleaseTag}`;
-                
-                affectedStringPart += ` < ${range.FixedSemver.Major}.${range.FixedSemver.Minor}.${range.FixedSemver.Patch}`
+
+                affectedStringPart += ` < ${range.FixedSemver.Major}.${range.FixedSemver.Minor}.${range.FixedSemver.Patch}`;
                 if (range.FixedSemver.PreReleaseTag != '')
-                    affectedStringPart += `-${range.FixedSemver.PreReleaseTag}`
+                    affectedStringPart += `-${range.FixedSemver.PreReleaseTag}`;
                 affectedStringParts.push(affectedStringPart);
             }
-        } 
-        
-        else if (affectedData.Exact.length > 0) {
+        } else if (affectedData.Exact.length > 0) {
             for (const exact of affectedData.Exact) {
                 affectedStringParts.push(exact.VersionString);
             }
-        } 
-
-        else if (affectedData.Universal) {
+        } else if (affectedData.Universal) {
             affectedStringParts.push('*');
         }
         return affectedStringParts.join(' || ');
     }
 
-    async getVersionsStatusArray(affectedVersionsString: string, affectedDependencyName: string): Promise<VulnerableVersionInfo[]> {
+    async getVersionsStatusArray(
+        affectedVersionsString: string,
+        affectedDependencyName: string
+    ): Promise<VulnerableVersionInfo[]> {
         // const versions = await this.#getVersions();
-        const versions: Version[] = []
+        const versions: Version[] = [];
         const versionsStatusArray: VulnerableVersionInfo[] = [];
         for (const version of versions) {
             if (satisfies(version.version, affectedVersionsString)) {
@@ -556,7 +556,10 @@ export class OSVReportGenerator extends BaseReportGenerator {
 
         // const patchedVersionsString = await this.getPatchedVersionsString('OSV');
         const affectedVersionsString = await this.getVulnerableVersionsString('OSV');
-        const versionsStatusArray = await this.getVersionsStatusArray(affectedVersionsString, vulnsData.AffectedDependency);
+        const versionsStatusArray = await this.getVersionsStatusArray(
+            affectedVersionsString,
+            vulnsData.AffectedDependency
+        );
 
         vulnInfo.version_info.affected_versions_string = affectedVersionsString;
         // vulnInfo.version_info.patched_versions_string = patchedVersionsString;
@@ -566,8 +569,8 @@ export class OSVReportGenerator extends BaseReportGenerator {
         let dependencyInfo: DependencyInfo | undefined;
         try {
             dependencyInfo = await this.getDependencyData();
-            dependencyInfo.name = vulnsData.AffectedDependency
-            dependencyInfo.version = vulnsData.AffectedVersion
+            dependencyInfo.name = vulnsData.AffectedDependency;
+            dependencyInfo.version = vulnsData.AffectedVersion;
         } catch (error) {
             // intentionally empty
         }
@@ -752,7 +755,10 @@ export class NVDReportGenerator extends BaseReportGenerator {
 
         // const patchedVersionsString = await this.getPatchedVersionsString('NVD');
         const affectedVersionsString = await this.getVulnerableVersionsString('NVD');
-        const versionsStatusArray = await this.getVersionsStatusArray(affectedVersionsString, vulnsData.AffectedDependency);
+        const versionsStatusArray = await this.getVersionsStatusArray(
+            affectedVersionsString,
+            vulnsData.AffectedDependency
+        );
 
         vulnInfo.version_info.affected_versions_string = affectedVersionsString;
         // vulnInfo.version_info.patched_versions_string = patchedVersionsString;
@@ -762,8 +768,8 @@ export class NVDReportGenerator extends BaseReportGenerator {
         let dependencyInfo: DependencyInfo | undefined;
         try {
             dependencyInfo = await this.getDependencyData();
-            dependencyInfo.name = vulnsData.AffectedDependency
-            dependencyInfo.version = vulnsData.AffectedVersion
+            dependencyInfo.name = vulnsData.AffectedDependency;
+            dependencyInfo.version = vulnsData.AffectedVersion;
         } catch (error) {
             // intentionally empty
         }

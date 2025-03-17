@@ -8,8 +8,8 @@ import { Repository } from 'typeorm';
 export class EmailRepository {
     constructor(
         @InjectRepository(Email, 'codeclarity') // Injecting the repository for the Email entity using the 'codeclarity' connection name
-        private emailRepository: Repository<Email>, // Declaring a private property to hold the injected repository
-    ) { }
+        private emailRepository: Repository<Email> // Declaring a private property to hold the injected repository
+    ) {}
 
     /**
      * Retrieves an email by type and user ID.
@@ -33,9 +33,9 @@ export class EmailRepository {
         });
 
         if (!mail) {
-            throw new EntityNotFound() // Throwing an error if no matching email is found
+            throw new EntityNotFound(); // Throwing an error if no matching email is found
         }
-        return mail
+        return mail;
     }
 
     /**
@@ -47,7 +47,7 @@ export class EmailRepository {
      * @throws EntityNotFound if no activation email is found matching the criteria.
      */
     async getActivationMail(activationTokenhash: string, userIdHash: string): Promise<Email> {
-        const mail =  await this.emailRepository.findOne({
+        const mail = await this.emailRepository.findOne({
             where: {
                 token_digest: activationTokenhash,
                 user_id_digest: userIdHash
@@ -58,9 +58,9 @@ export class EmailRepository {
         });
 
         if (!mail) {
-            throw new EntityNotFound() // Throwing an error if no matching activation email is found
+            throw new EntityNotFound(); // Throwing an error if no matching activation email is found
         }
-        return mail
+        return mail;
     }
 
     /**

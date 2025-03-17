@@ -2,9 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { Organization } from 'src/base_modules/organizations/organization.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Entity, Repository } from 'typeorm';
-import { MemberRole, OrganizationMemberships } from 'src/base_modules/organizations/memberships/organization.memberships.entity';
+import {
+    MemberRole,
+    OrganizationMemberships
+} from 'src/base_modules/organizations/memberships/organization.memberships.entity';
 import { EntityNotFound, NotAuthorized } from 'src/types/error.types';
-import { isMemberRoleLessThan, OrgMembership } from 'src/base_modules/organizations/memberships/orgMembership.types';
+import {
+    isMemberRoleLessThan,
+    OrgMembership
+} from 'src/base_modules/organizations/memberships/orgMembership.types';
 import { TypedPaginatedData } from 'src/types/pagination.types';
 import { User } from '../users/users.entity';
 
@@ -23,8 +29,8 @@ export class OrganizationsRepository {
         @InjectRepository(Organization, 'codeclarity')
         private organizationRepository: Repository<Organization>,
         @InjectRepository(OrganizationMemberships, 'codeclarity')
-        private membershipRepository: Repository<OrganizationMemberships>,
-    ) { }
+        private membershipRepository: Repository<OrganizationMemberships>
+    ) {}
     /**
      * Retrieve an organization by its ID.
      *
@@ -36,7 +42,7 @@ export class OrganizationsRepository {
     async getOrganizationById(orgId: string, relations?: object): Promise<Organization> {
         const organization = await this.organizationRepository.findOne({
             where: { id: orgId },
-            relations: relations,
+            relations: relations
         });
 
         if (!organization) {
@@ -54,7 +60,10 @@ export class OrganizationsRepository {
      * @returns The organization memberships entity if found, containing the role and ID.
      * @throws {EntityNotFound} If no membership exists for the given user in the organization.
      */
-    async getMembershipsByOrganizationId(organizationId: string, relations?: object): Promise<OrganizationMemberships[]> {
+    async getMembershipsByOrganizationId(
+        organizationId: string,
+        relations?: object
+    ): Promise<OrganizationMemberships[]> {
         const memberships = await this.membershipRepository.find({
             where: {
                 organization: {
@@ -99,7 +108,7 @@ export class OrganizationsRepository {
             where: {
                 user: { id: userId }
             }
-        })
+        });
         await this.membershipRepository.remove(memberships);
     }
 
@@ -114,9 +123,9 @@ export class OrganizationsRepository {
         const memberships = await this.membershipRepository.find({
             where: {
                 user: { id: userId },
-                organization: {id:organizationId}
+                organization: { id: organizationId }
             }
-        })
+        });
         await this.membershipRepository.remove(memberships);
         return 'User has left the organization. Membership removed successfully.';
     }
@@ -134,9 +143,9 @@ export class OrganizationsRepository {
             relations: { organization: true },
             where: {
                 organization: { id: orgId },
-                user: { id: userId },
+                user: { id: userId }
             },
-            select: { role: true, organizationMembershipId: true },
+            select: { role: true, organizationMembershipId: true }
         });
 
         if (!membership) {
@@ -154,7 +163,11 @@ export class OrganizationsRepository {
      * @param requiredRole - The minimum required role for the user.
      * @throws {NotAuthorized} If the user does not have the required role or is not a member.
      */
-    async hasRequiredRole(organizationId: string, userId: string, requiredRole: MemberRole): Promise<void> {
+    async hasRequiredRole(
+        organizationId: string,
+        userId: string,
+        requiredRole: MemberRole
+    ): Promise<void> {
         try {
             const memberRole = (await this.getMembershipRole(organizationId, userId)).role;
 
@@ -200,14 +213,18 @@ export class OrganizationsRepository {
             relations: { integrations: true },
             where: {
                 id: orgId,
-                integrations: { id: integrationId },
-            },
+                integrations: { id: integrationId }
+            }
         });
 
         return exists;
     }
 
-    async getMembershipByOrganizationAndUser(organizationId: string, userId: string, relations?: object): Promise<OrganizationMemberships> {
+    async getMembershipByOrganizationAndUser(
+        organizationId: string,
+        userId: string,
+        relations?: object
+    ): Promise<OrganizationMemberships> {
         const membership = await this.membershipRepository.findOne({
             where: {
                 organization: {
@@ -221,12 +238,12 @@ export class OrganizationsRepository {
         });
 
         if (!membership) {
-            throw new EntityNotFound()
+            throw new EntityNotFound();
         }
-        return membership
+        return membership;
     }
 
-    async getOrganizationsOfUser(userId: string): Promise<TypedPaginatedData<Object>> {
+    async getOrganizationsOfUser(userId: string): Promise<TypedPaginatedData<object>> {
         const memberships = await this.membershipRepository.find({
             where: {
                 user: {
@@ -239,7 +256,7 @@ export class OrganizationsRepository {
                     created_by: true,
                     organizationMemberships: true
                 },
-                user: true,
+                user: true
             }
         });
 
@@ -264,5 +281,4 @@ export class OrganizationsRepository {
             }
         });
     }
-
 }

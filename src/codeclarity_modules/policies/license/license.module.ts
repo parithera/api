@@ -7,14 +7,7 @@ import { OrganizationsModule } from 'src/base_modules/organizations/organization
 import { UsersModule } from 'src/base_modules/users/users.module';
 
 @Module({
-    imports: [
-        OrganizationsModule,
-        UsersModule,
-        TypeOrmModule.forFeature(
-            [Policy],
-            'codeclarity'
-        )
-    ],
+    imports: [OrganizationsModule, UsersModule, TypeOrmModule.forFeature([Policy], 'codeclarity')],
     providers: [LicensePolicyService],
     controllers: [LicensePolicyController]
 })

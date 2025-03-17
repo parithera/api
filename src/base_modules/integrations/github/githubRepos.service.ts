@@ -28,7 +28,7 @@ export class GithubRepositoriesService {
         private readonly organizationsRepository: OrganizationsRepository,
         private readonly integrationsRepository: IntegrationsRepository,
         @InjectRepository(RepositoryCache, 'codeclarity')
-        private repositoryCacheRepository: Repository<RepositoryCache>,
+        private repositoryCacheRepository: Repository<RepositoryCache>
     ) {}
 
     /**
@@ -38,7 +38,7 @@ export class GithubRepositoriesService {
      * @returns a boolean indicating whether the repos of the integration are synced
      */
     async areGithubReposSynced(integrationId: string): Promise<boolean> {
-        const integration = await this.integrationsRepository.getIntegrationById(integrationId)
+        const integration = await this.integrationsRepository.getIntegrationById(integrationId);
 
         const lastUpdated: Date | undefined = integration.last_repository_sync;
 
@@ -115,7 +115,9 @@ export class GithubRepositoriesService {
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         // (2) Check that the integration belongs to the org
-        if (!(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))) {
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
             throw new NotAuthorized();
         }
 
@@ -226,7 +228,9 @@ export class GithubRepositoriesService {
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
         // (2) Check that the integration belongs to the org
-        if (!(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))) {
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
             throw new NotAuthorized();
         }
 
@@ -277,7 +281,7 @@ export class GithubRepositoriesService {
         const githubToken = await this.githubIntegrationService.getToken(integrationId);
         const rawToken = githubToken.getToken();
 
-        const integration = await this.integrationsRepository.getIntegrationById(integrationId)
+        const integration = await this.integrationsRepository.getIntegrationById(integrationId);
 
         const entriesPerPage = 100;
 
@@ -315,7 +319,7 @@ export class GithubRepositoriesService {
      */
     private async saveRepos(repos: GithubRepositorySchema[], integrationId: string): Promise<void> {
         for (const rawRepo of repos) {
-            const integration = await this.integrationsRepository.getIntegrationById(integrationId)
+            const integration = await this.integrationsRepository.getIntegrationById(integrationId);
 
             const repository = new RepositoryCache();
             repository.repository_type = RepositoryType.GITHUB;

@@ -18,15 +18,19 @@ import { CombinedAuthGuard } from './guards/combined.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { APIDocCreatedResponseDecorator } from 'src/decorators/CrudResponse';
 import { ApiErrorDecorator } from 'src/decorators/ApiException';
-import {
-    EmailAlreadyExists,
-    EntityNotFound,
-} from 'src/types/error.types';
+import { EmailAlreadyExists, EntityNotFound } from 'src/types/error.types';
 import { APIDocTypedResponseDecorator } from 'src/decorators/TypedResponse';
 import { APIDocNoDataResponseDecorator } from 'src/decorators/NoDataResponse';
 import { User } from 'src/base_modules/users/users.entity';
 import { CannotPerformActionOnSocialAccount } from '../users/users.errors';
-import { AccountRegistrationVerificationTokenInvalidOrExpired, HandleAlreadyExists, PasswordResetTokenInvalidOrExpired, PasswordsDoNotMatch, RegistrationNotVerified, WrongCredentials } from './auth.errors';
+import {
+    AccountRegistrationVerificationTokenInvalidOrExpired,
+    HandleAlreadyExists,
+    PasswordResetTokenInvalidOrExpired,
+    PasswordsDoNotMatch,
+    RegistrationNotVerified,
+    WrongCredentials
+} from './auth.errors';
 
 @Controller('auth')
 export class AuthController {

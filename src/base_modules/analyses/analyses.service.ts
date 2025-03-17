@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AnalysisCreateBody } from 'src/base_modules/analyses/analysis.types';
 import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
-import {
-    RabbitMQError
-} from 'src/types/error.types';
+import { RabbitMQError } from 'src/types/error.types';
 import { ProjectMemberService } from '../projects/projectMember.service';
 import { PaginationConfig, PaginationUserSuppliedConf } from 'src/types/pagination.types';
 import { TypedPaginatedData } from 'src/types/pagination.types';
@@ -39,8 +37,8 @@ export class AnalysesService {
         private readonly sbomRepository: SBOMRepository,
         private readonly vulnerabilitiesRepository: VulnerabilitiesRepository,
         private readonly licensesRepository: LicensesRepository,
-        private readonly analysesRepository: AnalysesRepository,
-    ) { }
+        private readonly analysesRepository: AnalysesRepository
+    ) {}
 
     /**
      * Create/start an analysis
@@ -69,7 +67,9 @@ export class AnalysesService {
         const analyzer = await this.analyzersRepository.getAnalyzerById(analysisData.analyzer_id);
 
         // Fetch the project details using the project ID
-        const project = await this.projectsRepository.getProjectById(projectId, {integration: true});
+        const project = await this.projectsRepository.getProjectById(projectId, {
+            integration: true
+        });
 
         // Get the user details of the creator of the analysis
         const creator = await this.usersRepository.getUserById(user.userId);
@@ -156,10 +156,11 @@ export class AnalysesService {
         const queue = this.configService.getOrThrow<string>('AMQP_ANALYSES_QUEUE');
         const amqpHost = `${this.configService.getOrThrow<string>(
             'AMQP_PROTOCOL'
-        )}://${this.configService.getOrThrow<string>('AMQP_USER')}:${process.env.AMQP_PASSWORD
-            }@${this.configService.getOrThrow<string>(
-                'AMQP_HOST'
-            )}:${this.configService.getOrThrow<string>('AMQP_PORT')}`;
+        )}://${this.configService.getOrThrow<string>('AMQP_USER')}:${
+            process.env.AMQP_PASSWORD
+        }@${this.configService.getOrThrow<string>(
+            'AMQP_HOST'
+        )}:${this.configService.getOrThrow<string>('AMQP_PORT')}`;
 
         try {
             // Connect to RabbitMQ using the configured settings
@@ -227,7 +228,7 @@ export class AnalysesService {
         // (3) Check if the analysis belongs to the project
         await this.analysesRepository.doesAnalysesBelongToProject(id, projectId);
 
-        const analysis = await this.analysesRepository.getAnalysisById(id)
+        const analysis = await this.analysesRepository.getAnalysisById(id);
 
         return analysis;
     }
@@ -343,10 +344,7 @@ export class AnalysesService {
         );
 
         // (2) Check if the project belongs to the org
-        await this.projectMemberService.doesProjectBelongToOrg(
-            projectId,
-            organizationId
-        );
+        await this.projectMemberService.doesProjectBelongToOrg(projectId, organizationId);
 
         const paginationConfig: PaginationConfig = {
             maxEntriesPerPage: 100,
@@ -365,7 +363,11 @@ export class AnalysesService {
         if (paginationUserSuppliedConf.currentPage)
             currentPage = Math.max(0, paginationUserSuppliedConf.currentPage);
 
-        return this.analysesRepository.getAnalysisByProjectId(projectId, currentPage, entriesPerPage);
+        return this.analysesRepository.getAnalysisByProjectId(
+            projectId,
+            currentPage,
+            entriesPerPage
+        );
     }
 
     /**

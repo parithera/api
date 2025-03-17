@@ -4,7 +4,10 @@ import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 import { AnalysisResultsService } from '../results.service';
 import { paginate } from 'src/codeclarity_modules/results/utils/utils';
 import { Output as LicensesOutput } from 'src/codeclarity_modules/results/licenses/licenses.types';
-import { LicenseInfo, DepShortInfo } from 'src/codeclarity_modules/results/licenses/licenses2.types';
+import {
+    LicenseInfo,
+    DepShortInfo
+} from 'src/codeclarity_modules/results/licenses/licenses2.types';
 import { filter } from 'src/codeclarity_modules/results/licenses/utils/filter';
 import { sort } from 'src/codeclarity_modules/results/licenses/utils/sort';
 import { Output as SbomOutput } from 'src/codeclarity_modules/results/sbom/sbom.types';
@@ -23,8 +26,8 @@ export class LicensesService {
     constructor(
         private readonly analysisResultsService: AnalysisResultsService,
         private readonly licenseRepository: LicenseRepository,
-        private readonly licensesUtilsService:LicensesUtilsService,
-        private readonly sbomUtilsService:SbomUtilsService,
+        private readonly licensesUtilsService: LicensesUtilsService,
+        private readonly sbomUtilsService: SbomUtilsService,
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>
     ) {}
@@ -49,9 +52,8 @@ export class LicensesService {
         if (active_filters_string != null)
             active_filters = active_filters_string.replace('[', '').replace(']', '').split(',');
 
-        const licensesOutput: LicensesOutput = await this.licensesUtilsService.getLicensesResult(
-            analysisId
-        );
+        const licensesOutput: LicensesOutput =
+            await this.licensesUtilsService.getLicensesResult(analysisId);
 
         const licensesWorkspaceInfo = licensesOutput.workspaces[workspace];
         const licenseMap: { [key: string]: LicenseInfo } = {};
@@ -126,9 +128,8 @@ export class LicensesService {
     ): Promise<{ [key: string]: DepShortInfo }> {
         await this.analysisResultsService.checkAccess(orgId, projectId, analysisId, user);
 
-        const licensesOutput: LicensesOutput = await this.licensesUtilsService.getLicensesResult(
-            analysisId
-        );
+        const licensesOutput: LicensesOutput =
+            await this.licensesUtilsService.getLicensesResult(analysisId);
         const sbomOutput: SbomOutput = await this.sbomUtilsService.getSbomResult(analysisId);
 
         // Validate that the workspace exists

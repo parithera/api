@@ -1,6 +1,3 @@
 describe('GitlabController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

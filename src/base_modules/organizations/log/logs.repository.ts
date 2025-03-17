@@ -1,7 +1,7 @@
-import { Repository } from "typeorm";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Injectable } from "@nestjs/common";
-import { Log } from "./log.entity";
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
+import { Log } from './log.entity';
 
 /**
  * Injectable service for handling logs.
@@ -15,7 +15,7 @@ export class LogsRepository {
      */
     constructor(
         @InjectRepository(Log, 'codeclarity')
-        private logRepository: Repository<Log>,
+        private logRepository: Repository<Log>
     ) {}
 
     /**

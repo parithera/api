@@ -25,7 +25,7 @@ import { OrganizationsModule } from '../base_modules/organizations/organizations
         NotificationsModule,
         AnalyzersModule,
         ApiKeysModule,
-        OrganizationsModule,
+        OrganizationsModule
     ]
 })
 export class BaseModule {}

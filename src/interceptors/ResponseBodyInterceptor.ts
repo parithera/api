@@ -19,7 +19,8 @@ export class ResponseBodyInterceptor implements NestInterceptor {
         const response = ctx.getResponse<FastifyReply>();
         const statusCode = response.statusCode;
         let status = Status.Success; // Default success status
-        if (statusCode >= 400 && statusCode < 600) { // Check for failure status code (4xx or 5xx)
+        if (statusCode >= 400 && statusCode < 600) {
+            // Check for failure status code (4xx or 5xx)
             status = Status.Failure; // Update status to failure
         }
 
@@ -32,10 +33,12 @@ export class ResponseBodyInterceptor implements NestInterceptor {
                     };
                 }
 
-                if (!('status_code' in res)) { // Check if status code is missing
+                if (!('status_code' in res)) {
+                    // Check if status code is missing
                     res['status_code'] = statusCode;
                 }
-                if (!('status' in res)) { // Check if status is missing
+                if (!('status' in res)) {
+                    // Check if status is missing
                     res['status'] = status;
                 }
                 return res; // Return the updated response object

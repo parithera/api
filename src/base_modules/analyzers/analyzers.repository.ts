@@ -13,7 +13,7 @@ import { AnalyzerDoesNotExist } from './analyzers.errors';
 export class AnalyzersRepository {
     constructor(
         @InjectRepository(Analyzer, 'codeclarity')
-        private analyzerRepository: Repository<Analyzer>,
+        private analyzerRepository: Repository<Analyzer>
     ) {}
 
     /**
@@ -25,7 +25,7 @@ export class AnalyzersRepository {
      */
     async getAnalyzerById(analyzerId: string): Promise<Analyzer> {
         const analyzer = await this.analyzerRepository.findOneBy({
-            id: analyzerId,
+            id: analyzerId
         });
 
         if (!analyzer) {
@@ -65,8 +65,8 @@ export class AnalyzersRepository {
         let analyzer = await this.analyzerRepository.findOne({
             where: {
                 global: true,
-                id: analyzerId,
-            },
+                id: analyzerId
+            }
         });
         if (analyzer) {
             return;
@@ -75,9 +75,9 @@ export class AnalyzersRepository {
         // Else check if it belongs to organization
         analyzer = await this.analyzerRepository.findOne({
             relations: {
-                organization: true,
+                organization: true
             },
-            where: { id: analyzerId, organization: { id: orgId } },
+            where: { id: analyzerId, organization: { id: orgId } }
         });
         if (!analyzer) {
             throw new NotAuthorized();
@@ -114,7 +114,11 @@ export class AnalyzersRepository {
      * @param entriesPerPage - The number of entries per page (for pagination).
      * @returns A promise that resolves to a paginated list of Analyzers.
      */
-    async getManyAnalyzers(orgId: string, currentPage: number, entriesPerPage: number): Promise<TypedPaginatedData<Analyzer>> {
+    async getManyAnalyzers(
+        orgId: string,
+        currentPage: number,
+        entriesPerPage: number
+    ): Promise<TypedPaginatedData<Analyzer>> {
         const analyzersQueryBuilder = this.analyzerRepository
             .createQueryBuilder('analyzer')
             .leftJoinAndSelect('analyzer.organization', 'organization')
@@ -136,7 +140,7 @@ export class AnalyzersRepository {
             total_entries: fullCount,
             total_pages: Math.ceil(fullCount / entriesPerPage),
             matching_count: fullCount, // once you apply filters this needs to change
-            filter_count: {},
+            filter_count: {}
         };
     }
 }

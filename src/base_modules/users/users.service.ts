@@ -1,8 +1,6 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
-import {
-    NotAuthorized,
-} from 'src/types/error.types';
+import { NotAuthorized } from 'src/types/error.types';
 import {
     SocialType,
     UserCompleteSocialCreateBody,
@@ -23,8 +21,14 @@ import { Email, EmailType } from 'src/base_modules/email/email.entity';
 import { OrganizationsRepository } from '../organizations/organizations.repository';
 import { EmailRepository } from '../email/email.repository';
 import { UsersRepository } from './users.repository';
-import { CannotPerformActionOnSocialAccount, FailedToSendAccountRegistrationVerificationEmail } from './users.errors';
-import { AccountRegistrationVerificationTokenInvalidOrExpired, PasswordsDoNotMatch } from '../auth/auth.errors';
+import {
+    CannotPerformActionOnSocialAccount,
+    FailedToSendAccountRegistrationVerificationEmail
+} from './users.errors';
+import {
+    AccountRegistrationVerificationTokenInvalidOrExpired,
+    PasswordsDoNotMatch
+} from '../auth/auth.errors';
 
 /**
  * This service offers methods for working with users
@@ -38,7 +42,7 @@ export class UsersService {
         @Inject(forwardRef(() => AuthService))
         private readonly authService: AuthService,
         private readonly usersRepository: UsersRepository
-    ) { }
+    ) {}
 
     /**
      * Return the user with the given id.
@@ -53,7 +57,7 @@ export class UsersService {
             throw new NotAuthorized();
         }
 
-        return await this.usersRepository.getUserById(userId)
+        return await this.usersRepository.getUserById(userId);
     }
 
     /**
@@ -77,12 +81,12 @@ export class UsersService {
             MemberRole.USER
         );
 
-        const user = await this.usersRepository.getUserById(userId)
+        const user = await this.usersRepository.getUserById(userId);
 
         const organization = await this.organizationsRepository.getOrganizationById(orgId, {
             created_by: true,
             default: true
-        })
+        });
 
         // if (user.id != organization.created_by?.id) {
         //     throw new NotAuthorized('The user is not the owner of the organization');
@@ -163,7 +167,7 @@ export class UsersService {
      * @param email The email address to which to send the email to
      */
     async sendUserRegistrationVerificationEmail(email: string): Promise<void> {
-        const user = await this.usersRepository.getUserByEmail(email)
+        const user = await this.usersRepository.getUserByEmail(email);
 
         // If the user's registration is already verified simply return
         if (user.registration_verified == true) {
@@ -171,7 +175,10 @@ export class UsersService {
         }
 
         // Find one registration action where EmailActionType.USERS_REGISTRATION_VERIFICATION, and user id
-        const mail = await this.emailRepository.getMailByType(EmailType.USERS_REGISTRATION_VERIFICATION, user.id)
+        const mail = await this.emailRepository.getMailByType(
+            EmailType.USERS_REGISTRATION_VERIFICATION,
+            user.id
+        );
 
         const activationToken = await genRandomString(64);
         const activationTokenhash = await hash(activationToken, {});
@@ -213,7 +220,7 @@ export class UsersService {
      */
     async confirmRegistration(token: string, userIdHash: string): Promise<void> {
         const activationTokenhash = await hash(token, {});
-        const mail = await this.emailRepository.getActivationMail(activationTokenhash, userIdHash)
+        const mail = await this.emailRepository.getActivationMail(activationTokenhash, userIdHash);
 
         if (!mail) {
             throw new AccountRegistrationVerificationTokenInvalidOrExpired();
@@ -223,7 +230,7 @@ export class UsersService {
         mail.user.registration_verified = true;
 
         await this.usersRepository.saveUser(mail.user);
-        await this.emailRepository.removeMail(mail)
+        await this.emailRepository.removeMail(mail);
     }
 
     /**
@@ -314,32 +321,32 @@ export class UsersService {
         authenticatedUser: AuthenticatedUser
     ): Promise<void> {
         if (userId !== authenticatedUser.userId) {
-            throw new NotAuthorized()
+            throw new NotAuthorized();
         }
 
         if (passwordPatchBody.password !== passwordPatchBody.password_confirmation) {
-            throw new PasswordsDoNotMatch()
+            throw new PasswordsDoNotMatch();
         }
-        const user = await this.usersRepository.getUserById(authenticatedUser.userId)
+        const user = await this.usersRepository.getUserById(authenticatedUser.userId);
 
         if (user.social) {
-            throw new CannotPerformActionOnSocialAccount()
+            throw new CannotPerformActionOnSocialAccount();
         }
 
-        
-        const [match,_] = await this.authService.validateCredentials(user.email, passwordPatchBody.old_password)
+        const [match, _] = await this.authService.validateCredentials(
+            user.email,
+            passwordPatchBody.old_password
+        );
         if (!match) {
-            throw new Error('Old password not correct')
+            throw new Error('Old password not correct');
         }
 
         const newPasswordHash = await this.authService.hashPassword(passwordPatchBody.password);
 
-        user.password = newPasswordHash
+        user.password = newPasswordHash;
 
-        await this.usersRepository.saveUser(user)
+        await this.usersRepository.saveUser(user);
     }
-
-
 
     /**
      * Update a user's password
@@ -356,20 +363,20 @@ export class UsersService {
         authenticatedUser: AuthenticatedUser
     ): Promise<void> {
         if (userId !== authenticatedUser.userId) {
-            throw new NotAuthorized()
+            throw new NotAuthorized();
         }
 
-        const user = await this.usersRepository.getUserById(authenticatedUser.userId)
-        
-        if (userPatchBody.first_name){
-            user.first_name = userPatchBody.first_name
+        const user = await this.usersRepository.getUserById(authenticatedUser.userId);
+
+        if (userPatchBody.first_name) {
+            user.first_name = userPatchBody.first_name;
         }
 
-        if (userPatchBody.last_name){
-            user.last_name = userPatchBody.last_name
+        if (userPatchBody.last_name) {
+            user.last_name = userPatchBody.last_name;
         }
 
-        await this.usersRepository.saveUser(user)
+        await this.usersRepository.saveUser(user);
     }
 
     /**
@@ -394,7 +401,7 @@ export class UsersService {
             throw new NotAuthorized();
         }
 
-        const user = await this.usersRepository.getUserById(userId)
+        const user = await this.usersRepository.getUserById(userId);
 
         if (!user.social) {
             if (password == undefined) {

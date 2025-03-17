@@ -20,7 +20,10 @@ import {
     LinkGithubPatchBody
 } from 'src/base_modules/integrations/github/githubIntegration.types';
 import { MemberRole } from 'src/base_modules/organizations/memberships/orgMembership.types';
-import { IntegrationProvider, IntegrationType } from 'src/base_modules/integrations/integration.types';
+import {
+    IntegrationProvider,
+    IntegrationType
+} from 'src/base_modules/integrations/integration.types';
 import { Integration } from 'src/base_modules/integrations/integrations.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -35,7 +38,7 @@ export class GithubIntegrationService {
         private readonly usersRepository: UsersRepository,
         private readonly organizationsRepository: OrganizationsRepository,
         private readonly integrationsRepository: IntegrationsRepository
-    ) { }
+    ) {}
 
     /**
      * Add a GitHub integration to the organization.
@@ -59,26 +62,39 @@ export class GithubIntegrationService {
         user: AuthenticatedUser
     ): Promise<string> {
         if (linkGithubCreate.token_type !== GithubTokenType.CLASSIC_TOKEN) {
-        throw new IntegrationWrongTokenType();
-    }
+            throw new IntegrationWrongTokenType();
+        }
 
         const tokenType = this.getTokenTypeFromTokenString(linkGithubCreate.token);
         if (tokenType !== GithubTokenType.CLASSIC_TOKEN) {
             throw new IntegrationWrongTokenType();
-}
+        }
 
-        const organization = await this.organizationsRepository.getOrganizationById(orgId, { integrations: true });
+        const organization = await this.organizationsRepository.getOrganizationById(orgId, {
+            integrations: true
+        });
         if (!organization) {
             throw new EntityNotFound();
         }
 
         // Check if the organization already has a GitHub integration
-        if (organization.integrations && organization.integrations.some(i => i.integration_provider === IntegrationProvider.GITHUB)) {
+        if (
+            organization.integrations &&
+            organization.integrations.some(
+                (i) => i.integration_provider === IntegrationProvider.GITHUB
+            )
+        ) {
             throw new DuplicateIntegration();
         }
 
-        const [expires, expiresAt] = await this.githubIntegrationTokenService.getClassicTokenExpiryRemote(linkGithubCreate.token);
-        await this.githubIntegrationTokenService.validateClassicTokenPermissions(linkGithubCreate.token, {});
+        const [expires, expiresAt] =
+            await this.githubIntegrationTokenService.getClassicTokenExpiryRemote(
+                linkGithubCreate.token
+            );
+        await this.githubIntegrationTokenService.validateClassicTokenPermissions(
+            linkGithubCreate.token,
+            {}
+        );
 
         const owner = await this.usersRepository.getUserById(user.userId);
 
@@ -125,7 +141,9 @@ export class GithubIntegrationService {
         linkGithubPatch: LinkGithubPatchBody,
         user: AuthenticatedUser
     ): Promise<void> {
-        if (!(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))) {
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
             throw new NotAuthorized();
         }
 
@@ -140,7 +158,10 @@ export class GithubIntegrationService {
             throw new IntegrationWrongTokenType();
         }
 
-        const [expires, expiresAt] = await this.githubIntegrationTokenService.getClassicTokenExpiryRemote(linkGithubPatch.token);
+        const [expires, expiresAt] =
+            await this.githubIntegrationTokenService.getClassicTokenExpiryRemote(
+                linkGithubPatch.token
+            );
 
         const integration = await this.integrationsRepository.getIntegrationById(integrationId);
         integration.access_token = linkGithubPatch.token;
@@ -171,7 +192,9 @@ export class GithubIntegrationService {
         user: AuthenticatedUser
     ): Promise<Integration> {
         // Check if the integration belongs to the organization
-        if (!(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))) {
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
             throw new NotAuthorized();
         }
 
@@ -190,9 +213,15 @@ export class GithubIntegrationService {
      * @param integrationId The ID of the integration to remove.
      * @param user The authenticated user.
      */
-    async removeGithubIntegration(orgId: string, integrationId: string, user: AuthenticatedUser): Promise<void> {
+    async removeGithubIntegration(
+        orgId: string,
+        integrationId: string,
+        user: AuthenticatedUser
+    ): Promise<void> {
         // Check if the integration belongs to the organization
-        if (!(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))) {
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
             throw new NotAuthorized();
         }
 

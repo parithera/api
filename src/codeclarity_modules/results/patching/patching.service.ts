@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { AnalysisResultsService } from '../results.service';
 import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
-import { Output as PatchesOutput, Workspace } from 'src/codeclarity_modules/results/patching/patching.types';
+import {
+    Output as PatchesOutput,
+    Workspace
+} from 'src/codeclarity_modules/results/patching/patching.types';
 import { Output as VulnsOuptut } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
 import { Output as SbomOutput } from 'src/codeclarity_modules/results/sbom/sbom.types';
 import { UnknownWorkspace } from 'src/types/error.types';
 import { PatchingUtilsService } from './utils/utils';
 import { SbomUtilsService } from '../sbom/utils/utils';
 import { VulnerabilitiesUtilsService } from '../vulnerabilities/utils/utils.service';
-import { AnalysisStats, newAnalysisStats } from 'src/codeclarity_modules/results/patching/patching2.types';
+import {
+    AnalysisStats,
+    newAnalysisStats
+} from 'src/codeclarity_modules/results/patching/patching2.types';
 import { StatusResponse } from 'src/codeclarity_modules/results/status.types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -16,12 +22,11 @@ import { Result } from 'src/codeclarity_modules/results/result.entity';
 
 @Injectable()
 export class PatchingService {
-
     constructor(
         private readonly analysisResultsService: AnalysisResultsService,
-        private readonly patchingUtilsService:PatchingUtilsService,
-        private readonly sbomUtilsService:SbomUtilsService,
-        private readonly vulnerabilitiesUtilsService:VulnerabilitiesUtilsService,
+        private readonly patchingUtilsService: PatchingUtilsService,
+        private readonly sbomUtilsService: SbomUtilsService,
+        private readonly vulnerabilitiesUtilsService: VulnerabilitiesUtilsService,
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>
     ) {}
@@ -45,11 +50,11 @@ export class PatchingService {
         if (active_filters_string != null)
             active_filters = active_filters_string.replace('[', '').replace(']', '').split(',');
 
-        const patchesOutput: PatchesOutput = await this.patchingUtilsService.getPatchingResult(
-            analysisId
-        );
+        const patchesOutput: PatchesOutput =
+            await this.patchingUtilsService.getPatchingResult(analysisId);
         // const sbomOutput: SbomOutput = await getSbomResult(analysisId);
-        const vulnOutput: VulnsOuptut = await this.vulnerabilitiesUtilsService.getVulnsResult(analysisId);
+        const vulnOutput: VulnsOuptut =
+            await this.vulnerabilitiesUtilsService.getVulnsResult(analysisId);
 
         if (!(workspace in patchesOutput.workspaces)) {
             throw new UnknownWorkspace();
@@ -67,9 +72,8 @@ export class PatchingService {
     ): Promise<any> {
         await this.analysisResultsService.checkAccess(orgId, projectId, analysisId, user);
 
-        const patchesOutput: PatchesOutput = await this.patchingUtilsService.getPatchingResult(
-            analysisId
-        );
+        const patchesOutput: PatchesOutput =
+            await this.patchingUtilsService.getPatchingResult(analysisId);
         const sbomOutput: SbomOutput = await this.sbomUtilsService.getSbomResult(analysisId);
 
         if (!(workspace in patchesOutput.workspaces)) {
@@ -106,11 +110,11 @@ export class PatchingService {
             return 0.0;
         }
 
-        const patchesOutput: PatchesOutput = await this.patchingUtilsService.getPatchingResult(
-            analysisId
-        );
+        const patchesOutput: PatchesOutput =
+            await this.patchingUtilsService.getPatchingResult(analysisId);
         // const sbomOutput: SbomOutput = await getSbomResult(analysisId);
-        const vulnsOutput: VulnsOuptut = await this.vulnerabilitiesUtilsService.getVulnsResult(analysisId);
+        const vulnsOutput: VulnsOuptut =
+            await this.vulnerabilitiesUtilsService.getVulnsResult(analysisId);
 
         if (!(workspace in patchesOutput.workspaces)) {
             throw new UnknownWorkspace();
@@ -199,9 +203,8 @@ export class PatchingService {
     ): Promise<StatusResponse> {
         await this.analysisResultsService.checkAccess(orgId, projectId, analysisId, user);
 
-        const patchesOutput: PatchesOutput = await this.patchingUtilsService.getPatchingResult(
-            analysisId
-        );
+        const patchesOutput: PatchesOutput =
+            await this.patchingUtilsService.getPatchingResult(analysisId);
 
         if (patchesOutput.analysis_info.private_errors.length) {
             return {

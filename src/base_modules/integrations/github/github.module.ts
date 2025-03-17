@@ -14,17 +14,10 @@ import { IntegrationsModule } from '../integrations.module';
         forwardRef(() => UsersModule),
         OrganizationsModule,
         forwardRef(() => IntegrationsModule),
-        TypeOrmModule.forFeature(
-            [RepositoryCache],
-            'codeclarity'
-        )
+        TypeOrmModule.forFeature([RepositoryCache], 'codeclarity')
     ],
-    exports:[GithubRepositoriesService],
-    providers: [
-        GithubIntegrationService,
-        GithubRepositoriesService,
-        GithubIntegrationTokenService,
-    ],
+    exports: [GithubRepositoriesService],
+    providers: [GithubIntegrationService, GithubRepositoriesService, GithubIntegrationTokenService],
     controllers: [GithubIntegrationController]
 })
 export class GithubModule {}

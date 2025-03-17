@@ -10,10 +10,7 @@ import { IntegrationsRepository } from './integrations.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [Integration],
-            'codeclarity'
-        ),
+        TypeOrmModule.forFeature([Integration], 'codeclarity'),
         GitlabModule,
         GithubModule,
         OrganizationsModule
@@ -22,4 +19,4 @@ import { IntegrationsRepository } from './integrations.repository';
     providers: [IntegrationsService, IntegrationsRepository],
     controllers: [IntegrationsController]
 })
-export class IntegrationsModule { }
+export class IntegrationsModule {}

@@ -23,14 +23,14 @@ import { APIDocTypedResponseDecorator } from 'src/decorators/TypedResponse';
 import { APIDocTypedPaginatedResponseDecorator } from 'src/decorators/TypedPaginatedResponse';
 import { APIDocCreatedResponseDecorator } from 'src/decorators/CrudResponse';
 import { APIDocNoDataResponseDecorator } from 'src/decorators/NoDataResponse';
-import {
-    EntityNotFound,
-    NotAuthorized
-} from 'src/types/error.types';
+import { EntityNotFound, NotAuthorized } from 'src/types/error.types';
 import { ApiErrorDecorator } from 'src/decorators/ApiException';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Analysis } from 'src/base_modules/analyses/analysis.entity';
-import { AnalyzerDoesNotExist, AnaylzerMissingConfigAttribute } from '../analyzers/analyzers.errors';
+import {
+    AnalyzerDoesNotExist,
+    AnaylzerMissingConfigAttribute
+} from '../analyzers/analyzers.errors';
 
 @Controller('/org/:org_id/projects/:project_id/analyses')
 export class AnalysesController {

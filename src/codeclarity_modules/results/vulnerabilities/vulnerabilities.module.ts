@@ -24,10 +24,7 @@ import { VulnerabilitiesFilterService } from './utils/filter.service';
         KnowledgeModule,
         PatchingModule,
         SbomModule,
-        TypeOrmModule.forFeature(
-            [Result],
-            'codeclarity'
-        ),
+        TypeOrmModule.forFeature([Result], 'codeclarity')
     ],
     exports: [VulnerabilitiesRepository, VulnerabilitiesUtilsService],
     providers: [
@@ -37,7 +34,7 @@ import { VulnerabilitiesFilterService } from './utils/filter.service';
         VulnerabilitiesUtilsService,
         VulnerabilitiesSortService,
         VulnerabilitiesFilterService,
-        VulnerabilitiesRepository,
+        VulnerabilitiesRepository
     ],
     controllers: [FindingsController]
 })

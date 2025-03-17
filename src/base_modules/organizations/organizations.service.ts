@@ -31,7 +31,7 @@ export class OrganizationsService {
         private readonly usersRepository: UsersRepository,
         private readonly emailRepository: EmailRepository,
         private readonly invitationsRepository: InvitationsRepository
-    ) { }
+    ) {}
 
     /**
      * Creates an organization
@@ -45,7 +45,7 @@ export class OrganizationsService {
         organizationData: OrganizationCreateBody,
         user: AuthenticatedUser
     ): Promise<string> {
-        const creator = await this.usersRepository.getUserById(user.userId, {})
+        const creator = await this.usersRepository.getUserById(user.userId, {});
         if (!creator) {
             throw new EntityNotFound();
         }
@@ -79,21 +79,23 @@ export class OrganizationsService {
      * @param user The authenticated user
      * @returns the organization information
      */
-    async get(orgId: string, user: AuthenticatedUser): Promise<Object> {
+    async get(orgId: string, user: AuthenticatedUser): Promise<object> {
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
         const membership = await this.organizationsRepository.getMembershipByOrganizationAndUser(
-            orgId, user.userId, {
-            organization: {
-                created_by: true,
-                organizationMemberships: true
-            },
-            user: false
-        }
-        )
+            orgId,
+            user.userId,
+            {
+                organization: {
+                    created_by: true,
+                    organizationMemberships: true
+                },
+                user: false
+            }
+        );
 
-        const number_of_members = await this.organizationsRepository.countMembers(orgId)
+        const number_of_members = await this.organizationsRepository.countMembers(orgId);
 
-        const organizationInfo: Object = {
+        const organizationInfo: object = {
             ...membership.organization,
             role: membership.role,
             joined_on: membership.joined_on,
@@ -119,7 +121,7 @@ export class OrganizationsService {
                 analyses: true
             },
             integrations: true
-        })
+        });
     }
 
     /**
@@ -137,8 +139,8 @@ export class OrganizationsService {
         searchKey?: string,
         sortBy?: string,
         sortDirection?: SortDirection
-    ): Promise<TypedPaginatedData<Object>> {
-        return this.organizationsRepository.getOrganizationsOfUser(user.userId)
+    ): Promise<TypedPaginatedData<object>> {
+        return this.organizationsRepository.getOrganizationsOfUser(user.userId);
     }
 
     /**
@@ -161,7 +163,10 @@ export class OrganizationsService {
         sortBy?: string,
         sortDirection?: SortDirection
     ): Promise<TypedPaginatedData<OrganizationMemberships>> {
-        const memberships = await this.organizationsRepository.getMembershipsByOrganizationId(orgId, { organization: true, user: true })
+        const memberships = await this.organizationsRepository.getMembershipsByOrganizationId(
+            orgId,
+            { organization: true, user: true }
+        );
         return {
             data: memberships,
             page: 0,
@@ -171,7 +176,7 @@ export class OrganizationsService {
             total_pages: 0,
             matching_count: 0,
             filter_count: {}
-        }
+        };
     }
 
     /**
@@ -195,11 +200,11 @@ export class OrganizationsService {
     ): Promise<void> {
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.OWNER);
 
-        const invitedUser = await this.usersRepository.getUserByEmail(inviteBody.user_email)
-        
-        const inviter = await this.usersRepository.getUserById(user.userId, {})
+        const invitedUser = await this.usersRepository.getUserByEmail(inviteBody.user_email);
 
-        const org = await this.organizationsRepository.getOrganizationById(orgId)
+        const inviter = await this.usersRepository.getUserById(user.userId, {});
+
+        const org = await this.organizationsRepository.getOrganizationById(orgId);
 
         const activationToken = await genRandomString(64);
         const activationTokenhash = await hash(activationToken, {});
@@ -299,7 +304,10 @@ export class OrganizationsService {
         //     }
         // });
 
-        const invitations = await this.invitationsRepository.getInvitationsByOrganizationAndUser(orgId, user.userId)
+        const invitations = await this.invitationsRepository.getInvitationsByOrganizationAndUser(
+            orgId,
+            user.userId
+        );
 
         // for (const org of organizations) {
         //     const invitation = new Invitation();
@@ -345,7 +353,7 @@ export class OrganizationsService {
                 },
                 user: true
             }
-        )
+        );
 
         const membership = new OrganizationMemberships();
         membership.joined_on = new Date();
@@ -356,7 +364,7 @@ export class OrganizationsService {
         await this.organizationsRepository.saveMembership(membership);
         await this.invitationsRepository.deleteInvitation(invitation);
 
-        const mail = await this.emailRepository.getActivationMail(inviteToken, emailDigest)
+        const mail = await this.emailRepository.getActivationMail(inviteToken, emailDigest);
         await this.emailRepository.deleteMail(mail);
     }
 
@@ -374,7 +382,7 @@ export class OrganizationsService {
         emailDigest: string,
         user: AuthenticatedUser
     ): Promise<OrganizationInfoForInvitee> {
-        const invitee = await this.usersRepository.getUserById(user.userId, {})
+        const invitee = await this.usersRepository.getUserById(user.userId, {});
         if (!invitee) {
             throw new EntityNotFound();
         }
@@ -393,7 +401,7 @@ export class OrganizationsService {
                 },
                 user: true
             }
-        )
+        );
 
         info.id = invitation.id;
         info.name = invitation.organization.name;
@@ -440,7 +448,7 @@ export class OrganizationsService {
      * @param user The authenticated user
      */
     async leaveOrg(orgId: string, user: AuthenticatedUser): Promise<void> {
-        await this.organizationsRepository.leaveOrganization(user.userId, orgId)
+        await this.organizationsRepository.leaveOrganization(user.userId, orgId);
     }
 
     /**
@@ -455,9 +463,10 @@ export class OrganizationsService {
     async deleteOrg(orgId: string, user: AuthenticatedUser): Promise<void> {
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
 
-        const memberships = await this.organizationsRepository.getMembershipsByOrganizationId(orgId)
+        const memberships =
+            await this.organizationsRepository.getMembershipsByOrganizationId(orgId);
         await this.organizationsRepository.removeMemberships(memberships);
-        await this.organizationsRepository.deleteOrganization(orgId)
+        await this.organizationsRepository.deleteOrganization(orgId);
     }
 
     /**
@@ -478,4 +487,3 @@ export class OrganizationsService {
         throw new Error('Method not implemented.');
     }
 }
-

@@ -1,4 +1,4 @@
-import { PublicAPIError } from "src/types/error.types";
+import { PublicAPIError } from 'src/types/error.types';
 
 export const errorMessages: { [key: string]: string } = {
     SetupAlreadyDone:
@@ -11,9 +11,8 @@ export const errorMessages: { [key: string]: string } = {
         'Before being able to use our platform, verify your registration via the email send to your inbox.',
     WrongCredentials: 'You have entered the wrong credentials.',
     PasswordResetTokenInvalidOrExpired: 'The password reset token does not exist or has expired.',
-    PasswordsDoNotMatch: 'The passwords do not match.',
+    PasswordsDoNotMatch: 'The passwords do not match.'
 };
-
 
 export class AccountRegistrationVerificationTokenInvalidOrExpired extends PublicAPIError {
     static errorCode = 'AccountRegistrationVerificationTokenInvalidOrExpired';
@@ -30,8 +29,6 @@ export class AccountRegistrationVerificationTokenInvalidOrExpired extends Public
     }
 }
 
-
-
 export class HandleAlreadyExists extends PublicAPIError {
     static errorCode = 'HandleAlreadyExists';
     static errorMessage = errorMessages[HandleAlreadyExists.errorCode];
@@ -45,7 +42,6 @@ export class HandleAlreadyExists extends PublicAPIError {
         );
     }
 }
-
 
 export class RegistrationNotVerified extends PublicAPIError {
     static errorCode = 'RegistrationNotVerified';
@@ -102,4 +98,3 @@ export class PasswordsDoNotMatch extends PublicAPIError {
         );
     }
 }
-

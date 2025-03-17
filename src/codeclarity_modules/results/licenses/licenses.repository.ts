@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Output as LicensesOutput, Status } from 'src/codeclarity_modules/results/licenses/licenses.types';
+import {
+    Output as LicensesOutput,
+    Status
+} from 'src/codeclarity_modules/results/licenses/licenses.types';
 import { PluginFailed, PluginResultNotAvailable } from 'src/types/error.types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,10 +15,7 @@ export class LicensesRepository {
         private resultRepository: Repository<Result>
     ) {}
 
-    
-    async getLicensesResult(
-        analysis_id: string,
-    ): Promise<LicensesOutput> {
+    async getLicensesResult(analysis_id: string): Promise<LicensesOutput> {
         const result = await this.resultRepository.findOne({
             relations: { analysis: true },
             where: {
@@ -34,7 +34,7 @@ export class LicensesRepository {
         if (!result) {
             throw new PluginResultNotAvailable();
         }
-    
+
         const licenses: LicensesOutput = result.result as unknown as LicensesOutput;
         if (licenses.analysis_info.status == Status.Failure) {
             throw new PluginFailed();

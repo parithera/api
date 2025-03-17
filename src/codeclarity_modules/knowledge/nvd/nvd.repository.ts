@@ -12,14 +12,14 @@ export class NVDRepository {
     ) {}
 
     async getVuln(cve: string): Promise<NVD> {
-        const nvd = await this.getVulnWithoutFailing(cve)
+        const nvd = await this.getVulnWithoutFailing(cve);
         if (!nvd) {
             throw new EntityNotFound();
         }
         return nvd;
     }
 
-    async getVulnWithoutFailing(cve: string): Promise<NVD|null> {
+    async getVulnWithoutFailing(cve: string): Promise<NVD | null> {
         return await this.nvdRepository.findOne({
             where: {
                 nvd_id: cve

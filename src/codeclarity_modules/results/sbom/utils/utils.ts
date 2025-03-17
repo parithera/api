@@ -27,13 +27,10 @@ export class SbomUtilsService {
         private readonly licensesUtilsService: LicensesUtilsService,
         private readonly packageRepository: PackageRepository,
         @InjectRepository(Result, 'codeclarity')
-        private resultRepository: Repository<Result>,
-    ) { }
+        private resultRepository: Repository<Result>
+    ) {}
 
-    async getSbomData(
-        analysis_id: string,
-        workspace: string,
-    ): Promise<Dependency[]> {
+    async getSbomData(analysis_id: string, workspace: string): Promise<Dependency[]> {
         const sbom: SBOMOutput = await this.getSbomResult(analysis_id);
 
         // Validate that the workspace exists
@@ -50,9 +47,7 @@ export class SbomUtilsService {
         return dependenciesArray;
     }
 
-    async getSbomResult(
-        analysis_id: string
-    ): Promise<SBOMOutput> {
+    async getSbomResult(analysis_id: string): Promise<SBOMOutput> {
         const result = await this.resultRepository.findOne({
             relations: { analysis: true },
             where: {
@@ -86,9 +81,13 @@ export class SbomUtilsService {
         dependency_version: string,
         sbom: SBOMOutput
     ): Promise<DependencyDetails> {
-        const package_version = await this.packageRepository.getVersionInfo(dependency_name, dependency_version)
+        const package_version = await this.packageRepository.getVersionInfo(
+            dependency_name,
+            dependency_version
+        );
 
-        const dependency = sbom.workspaces[workspace].dependencies[dependency_name][dependency_version];
+        const dependency =
+            sbom.workspaces[workspace].dependencies[dependency_name][dependency_version];
 
         const version = package_version.versions[0];
         const dependency_details: DependencyDetails = {
@@ -115,18 +114,27 @@ export class SbomUtilsService {
         };
 
         // Attach vulnerability info if the service has finished
-        const vulns: VulnsOutput = await this.vulnerabilitiesUtilsService.getVulnsResult(analysis_id);
+        const vulns: VulnsOutput =
+            await this.vulnerabilitiesUtilsService.getVulnsResult(analysis_id);
 
-        dependency_details.vulnerabilities = []
+        dependency_details.vulnerabilities = [];
 
         for (const vuln of vulns.workspaces['.'].Vulnerabilities) {
-            if (vuln.AffectedDependency == dependency_name && vuln.AffectedVersion == dependency_version) {
-                dependency_details.vulnerabilities.push(vuln.VulnerabilityId)
-                dependency_details.severity_dist.critical += vuln.Severity.SeverityClass == 'CRITICAL' ? 1 : 0
-                dependency_details.severity_dist.high += vuln.Severity.SeverityClass == 'HIGH' ? 1 : 0
-                dependency_details.severity_dist.medium += vuln.Severity.SeverityClass == 'MEDIUM' ? 1 : 0
-                dependency_details.severity_dist.low += vuln.Severity.SeverityClass == 'LOW' ? 1 : 0
-                dependency_details.severity_dist.none += vuln.Severity.SeverityClass == 'NONE' ? 1 : 0
+            if (
+                vuln.AffectedDependency == dependency_name &&
+                vuln.AffectedVersion == dependency_version
+            ) {
+                dependency_details.vulnerabilities.push(vuln.VulnerabilityId);
+                dependency_details.severity_dist.critical +=
+                    vuln.Severity.SeverityClass == 'CRITICAL' ? 1 : 0;
+                dependency_details.severity_dist.high +=
+                    vuln.Severity.SeverityClass == 'HIGH' ? 1 : 0;
+                dependency_details.severity_dist.medium +=
+                    vuln.Severity.SeverityClass == 'MEDIUM' ? 1 : 0;
+                dependency_details.severity_dist.low +=
+                    vuln.Severity.SeverityClass == 'LOW' ? 1 : 0;
+                dependency_details.severity_dist.none +=
+                    vuln.Severity.SeverityClass == 'NONE' ? 1 : 0;
             }
         }
 

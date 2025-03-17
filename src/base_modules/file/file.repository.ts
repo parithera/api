@@ -33,7 +33,18 @@ export class FileRepository {
      *
      * @param files - Criteria or identifiers for the files to be deleted.
      */
-    async deleteFiles(files: string | number | string[] | Date | number[] | ObjectId | Date[] | ObjectId[] | FindOptionsWhere<File>) {
+    async deleteFiles(
+        files:
+            | string
+            | number
+            | string[]
+            | Date
+            | number[]
+            | ObjectId
+            | Date[]
+            | ObjectId[]
+            | FindOptionsWhere<File>
+    ) {
         await this.fileRepository.delete(files);
     }
 

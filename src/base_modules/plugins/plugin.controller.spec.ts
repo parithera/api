@@ -1,6 +1,3 @@
 describe('PluginController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

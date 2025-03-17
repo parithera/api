@@ -1,6 +1,3 @@
 describe('EmailController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

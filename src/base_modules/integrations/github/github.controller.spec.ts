@@ -1,6 +1,3 @@
 describe('GithubController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

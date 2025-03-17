@@ -11,11 +11,9 @@ export class LicensesUtilsService {
     constructor(
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>
-    ) { }
+    ) {}
 
-    async getLicensesResult(
-        analysis_id: string
-    ): Promise<LicensesOutput> {
+    async getLicensesResult(analysis_id: string): Promise<LicensesOutput> {
         const result = await this.resultRepository.findOne({
             relations: { analysis: true },
             where: {

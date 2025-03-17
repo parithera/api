@@ -15,11 +15,9 @@ export class VulnerabilitiesUtilsService {
     constructor(
         @InjectRepository(Result, 'codeclarity')
         private resultRepository: Repository<Result>
-    ) { }
+    ) {}
 
-    async getVulnsResult(
-        analysis_id: string
-    ): Promise<VulnsOutput> {
+    async getVulnsResult(analysis_id: string): Promise<VulnsOutput> {
         const result = await this.resultRepository.findOne({
             relations: { analysis: true },
             where: {
@@ -46,10 +44,7 @@ export class VulnerabilitiesUtilsService {
         return vulns;
     }
 
-    async getFindingsData(
-        analysis_id: string,
-        workspace: string
-    ): Promise<Vulnerability[]> {
+    async getFindingsData(analysis_id: string, workspace: string): Promise<Vulnerability[]> {
         const findings: VulnsOutput = await this.getVulnsResult(analysis_id);
 
         // Validate that the workspace exists

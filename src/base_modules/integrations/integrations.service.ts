@@ -66,7 +66,9 @@ export class IntegrationsService {
         user: AuthenticatedUser
     ): Promise<Integration> {
         // Check if the specified integration belongs to the given organization.
-        if (!(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))) {
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
             throw new NotAuthorized();
         }
 
@@ -93,10 +95,19 @@ export class IntegrationsService {
     ): Promise<void> {
         try {
             // Only organization owners and admins can remove an integration.
-            await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.ADMIN);
+            await this.organizationsRepository.hasRequiredRole(
+                orgId,
+                user.userId,
+                MemberRole.ADMIN
+            );
 
             // Verify that the specified integration belongs to the given organization.
-            if (!(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))) {
+            if (
+                !(await this.organizationsRepository.doesIntegrationBelongToOrg(
+                    integrationId,
+                    orgId
+                ))
+            ) {
                 throw new NotAuthorized();
             }
 

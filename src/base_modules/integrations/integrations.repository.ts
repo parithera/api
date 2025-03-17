@@ -9,7 +9,7 @@ import { TypedPaginatedResponse } from 'src/types/apiResponses.types';
 export class IntegrationsRepository {
     constructor(
         @InjectRepository(Integration, 'codeclarity')
-        private integrationRepository: Repository<Integration>,
+        private integrationRepository: Repository<Integration>
     ) {}
 
     /**
@@ -38,7 +38,11 @@ export class IntegrationsRepository {
      * @throws EntityNotFound - If no integration is found with the given ID.
      * @throws NotAuthorized - If the integration does not belong to the specified organization.
      */
-    async getIntegrationByIdAndOrganizationAndUser(integrationId: string, organizationId: string, userId: string): Promise<Integration> {
+    async getIntegrationByIdAndOrganizationAndUser(
+        integrationId: string,
+        organizationId: string,
+        userId: string
+    ): Promise<Integration> {
         const integration = await this.integrationRepository.findOne({
             relations: {
                 organizations: true,
@@ -73,7 +77,11 @@ export class IntegrationsRepository {
      * @param entriesPerPage - The number of entries per page.
      * @returns A paginated response containing the list of integrations and pagination details.
      */
-    async getVCSIntegrations(orgId: string, currentPage: number, entriesPerPage: number): Promise<TypedPaginatedResponse<Integration>> {
+    async getVCSIntegrations(
+        orgId: string,
+        currentPage: number,
+        entriesPerPage: number
+    ): Promise<TypedPaginatedResponse<Integration>> {
         const integrations = await this.integrationRepository.find({
             relations: {
                 organizations: true

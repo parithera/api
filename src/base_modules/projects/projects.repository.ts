@@ -11,8 +11,8 @@ import { SortDirection } from 'src/types/sort.types';
 export class ProjectsRepository {
     constructor(
         @InjectRepository(Project, 'codeclarity')
-        private projectRepository: Repository<Project>,
-    ) { }
+        private projectRepository: Repository<Project>
+    ) {}
 
     async getProjectById(projectId: string, relations?: object): Promise<Project> {
         const project = await this.projectRepository.findOne({
@@ -24,10 +24,14 @@ export class ProjectsRepository {
             throw new EntityNotFound();
         }
 
-        return project
+        return project;
     }
 
-    async getProjectByIdAndOrganization(projectId: string, organizationId: string, relations?: object): Promise<Project> {
+    async getProjectByIdAndOrganization(
+        projectId: string,
+        organizationId: string,
+        relations?: object
+    ): Promise<Project> {
         const project = await this.projectRepository.findOne({
             where: {
                 id: projectId,
@@ -42,15 +46,15 @@ export class ProjectsRepository {
             throw new ProjectDoesNotExist();
         }
 
-        return project
+        return project;
     }
 
     /**
-        * Checks whether the integration, with the given id, belongs to the organization, with the given id
-        * @param integrationId The id of the integration
-        * @param orgId The id of the organization
-        * @returns whether or not the integration belongs to the org
-        */
+     * Checks whether the integration, with the given id, belongs to the organization, with the given id
+     * @param integrationId The id of the integration
+     * @param orgId The id of the organization
+     * @returns whether or not the integration belongs to the org
+     */
     async doesProjectBelongToOrg(projectId: string, orgId: string) {
         const belongs = await this.projectRepository.exists({
             relations: {
@@ -69,20 +73,28 @@ export class ProjectsRepository {
     }
 
     async deleteProject(projectId: string) {
-        await this.projectRepository.delete(projectId)
+        await this.projectRepository.delete(projectId);
     }
 
     async deleteUserProjects(userId: string) {
-        const projects = await this.projectRepository.find({where:{added_by:{id: userId}}})
-        await this.projectRepository.remove(projects)
+        const projects = await this.projectRepository.find({ where: { added_by: { id: userId } } });
+        await this.projectRepository.remove(projects);
     }
 
     async saveProject(project: Project): Promise<Project> {
-        return this.projectRepository.save(project)
+        return this.projectRepository.save(project);
     }
 
-    async getManyProjects(orgId: string, currentPage: number, entriesPerPage: number, searchKey?: string, sortBy?: AllowedOrderByGetProjects, sortDirection?: SortDirection): Promise<TypedPaginatedData<Project>> {
-        let queryBuilder = await this.projectRepository.createQueryBuilder('project')
+    async getManyProjects(
+        orgId: string,
+        currentPage: number,
+        entriesPerPage: number,
+        searchKey?: string,
+        sortBy?: AllowedOrderByGetProjects,
+        sortDirection?: SortDirection
+    ): Promise<TypedPaginatedData<Project>> {
+        let queryBuilder = await this.projectRepository
+            .createQueryBuilder('project')
             .leftJoin('project.organizations', 'organizations')
             .where('organizations.id = :orgId', { orgId: orgId })
             .leftJoinAndSelect('project.analyses', 'analyses')
@@ -107,9 +119,7 @@ export class ProjectsRepository {
 
         const fullCount = await queryBuilder.getCount();
 
-        queryBuilder = queryBuilder
-            .limit(entriesPerPage)
-            .offset(currentPage * entriesPerPage);
+        queryBuilder = queryBuilder.limit(entriesPerPage).offset(currentPage * entriesPerPage);
 
         const projects = await queryBuilder.getMany();
 

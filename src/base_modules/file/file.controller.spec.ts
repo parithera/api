@@ -1,6 +1,3 @@
 describe('FileController', () => {
-    it('empty', () => {
-      
-    })
-  });
-  
+    it('empty', () => {});
+});

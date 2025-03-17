@@ -16,9 +16,7 @@ import { OrganizationsRepository } from 'src/base_modules/organizations/organiza
 
 @Injectable()
 export class GitlabIntegrationService {
-    constructor(
-        private readonly organizationsRepository: OrganizationsRepository
-    ) {}
+    constructor(private readonly organizationsRepository: OrganizationsRepository) {}
 
     /**
      *
@@ -35,7 +33,9 @@ export class GitlabIntegrationService {
         user: AuthenticatedUser
     ): Promise<GitlabIntegration> {
         // (1) Check that the integration belongs to the org
-        if (!(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))) {
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
             throw new NotAuthorized();
         }
 
@@ -105,7 +105,9 @@ export class GitlabIntegrationService {
         linkGitlabCreate: LinkGitlabPatchBody,
         user: AuthenticatedUser
     ): Promise<void> {
-        if (!(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))) {
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
             throw new NotAuthorized();
         }
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.ADMIN);
