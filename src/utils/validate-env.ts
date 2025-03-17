@@ -10,7 +10,7 @@ import {
     validateSync
 } from 'class-validator';
 
-const dotenv = require('dotenv');
+import * as dotenv from 'dotenv';
 
 /**
  * Enum representing the different environments.
@@ -240,7 +240,7 @@ function validateBootstrap() {
     }
 
     // Check if there were any errors loading the config
-    if (res.error) {
+    if (res && res.error) {
         throw res.error;
     }
 

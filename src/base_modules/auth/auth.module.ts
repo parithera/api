@@ -12,9 +12,7 @@ import { GitlabAuthController } from './gitlab.controller';
 import { EmailModule } from '../email/email.module';
 import { UsersModule } from '../users/users.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
-
-const fs = require('fs');
-
+import * as fs from 'fs';
 /**
  * Authentication module, that secures the endpoints of the API
  */

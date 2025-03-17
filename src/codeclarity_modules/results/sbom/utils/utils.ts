@@ -4,14 +4,8 @@ import {
     Output as SBOMOutput,
     Status
 } from 'src/codeclarity_modules/results/sbom/sbom.types';
-import { Output as LicenseOutput } from 'src/codeclarity_modules/results/licenses/licenses.types';
 import { Output as VulnsOutput } from 'src/codeclarity_modules/results/vulnerabilities/vulnerabilities.types';
-import {
-    EntityNotFound,
-    PluginFailed,
-    PluginResultNotAvailable,
-    UnknownWorkspace
-} from 'src/types/error.types';
+import { PluginFailed, PluginResultNotAvailable, UnknownWorkspace } from 'src/types/error.types';
 import { Result } from 'src/codeclarity_modules/results/result.entity';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';

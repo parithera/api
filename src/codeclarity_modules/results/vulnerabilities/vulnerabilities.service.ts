@@ -105,6 +105,7 @@ export class VulnerabilitiesService {
             // // dependencyMapPrevious = sbomOutputPrevious.workspaces[workspace].dependencies;
             // findingsArrayPrevious = await getFindingsData(previousAnalysis.id, workspace);
         } catch (error) {
+            console.error(error);
             // dependencyMapPrevious = {};
             findingsArrayPrevious = [];
         }

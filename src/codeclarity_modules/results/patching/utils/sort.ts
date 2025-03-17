@@ -44,6 +44,8 @@ export function sort(
 
     if (sortBySafe == 'patch_type') {
         sorted = patches.sort((a: PatchInfo, b: PatchInfo) => {
+            console.log(a, b);
+
             // if (patchTypeToNumeric(a.patch_type) > patchTypeToNumeric(b.patch_type))
             //     return sortDirectionSafe == 'DESC' ? -1 : 1;
             // if (patchTypeToNumeric(a.patch_type) < patchTypeToNumeric(b.patch_type))

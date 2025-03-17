@@ -51,6 +51,8 @@ function sort(
 
     if (sortBySafe == 'licenses') {
         sorted = dependencies.sort((a: SbomDependency, b: SbomDependency) => {
+            console.log(a, b);
+
             // if ((a.licenses[0] ?? '') > (b.licenses[0] ?? ''))
             //     return sortDirectionSafe == 'DESC' ? 1 : -1;
             // if ((a.licenses[0] ?? '') < (b.licenses[0] ?? ''))
@@ -72,6 +74,7 @@ function sort(
         });
     } else if (sortBySafe == 'combined_severity') {
         sorted = dependencies.sort((a: SbomDependency, b: SbomDependency) => {
+            console.log(a, b);
             // if ((a.combined_severity ?? 0.0) > (b.combined_severity ?? 0.0))
             //     return sortDirectionSafe == 'DESC' ? -1 : 1;
             // if ((a.combined_severity ?? 0.0) < (b.combined_severity ?? 0.0))

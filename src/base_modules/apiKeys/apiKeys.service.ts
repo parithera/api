@@ -12,6 +12,7 @@ export class ApiKeysService {
      * @param user The authenticated user
      */
     async deleteApiKey(apiKeyId: string, user: AuthenticatedUser): Promise<void> {
+        console.log(apiKeyId, user);
         throw new Error('Not implemented');
     }
 }

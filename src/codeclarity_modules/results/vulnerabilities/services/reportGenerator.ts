@@ -247,7 +247,7 @@ abstract class BaseReportGenerator {
                 //     common_consequences[weakeness.WeaknessId] = common_cons_array;
                 // }
             } catch (error) {
-                /* empty */
+                console.error(error);
             }
         }
 
@@ -302,6 +302,7 @@ abstract class BaseReportGenerator {
 
             return dependencyInfo;
         } catch (error) {
+            console.error(error);
             return dependencyInfo;
         }
     }
@@ -314,6 +315,7 @@ abstract class BaseReportGenerator {
                 try {
                     return this.owaspRepository.getOwaspTop10CategoryInfo(weakeness.OWASPTop10Id);
                 } catch (err) {
+                    console.error(err);
                     return null;
                 }
             }
@@ -572,7 +574,7 @@ export class OSVReportGenerator extends BaseReportGenerator {
             dependencyInfo.name = vulnsData.AffectedDependency;
             dependencyInfo.version = vulnsData.AffectedVersion;
         } catch (error) {
-            // intentionally empty
+            console.error(error);
         }
 
         /** Common consequences and waeknesses */
@@ -771,7 +773,7 @@ export class NVDReportGenerator extends BaseReportGenerator {
             dependencyInfo.name = vulnsData.AffectedDependency;
             dependencyInfo.version = vulnsData.AffectedVersion;
         } catch (error) {
-            // intentionally empty
+            console.error(error);
         }
 
         /** Common consequences and waeknesses */

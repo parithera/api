@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import * as crypto from 'crypto';
 
 /**
  * Generate a hash of a given string using SHA-256 by default.
