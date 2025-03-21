@@ -73,14 +73,13 @@ function sort(
             return 0;
         });
     } else if (sortBySafe == 'combined_severity') {
-        sorted = dependencies.sort((a: SbomDependency, b: SbomDependency) => {
-            console.log(a, b);
+        // sorted = dependencies.sort((a: SbomDependency, b: SbomDependency) => {
             // if ((a.combined_severity ?? 0.0) > (b.combined_severity ?? 0.0))
             //     return sortDirectionSafe == 'DESC' ? -1 : 1;
             // if ((a.combined_severity ?? 0.0) < (b.combined_severity ?? 0.0))
             //     return sortDirectionSafe == 'DESC' ? 1 : -1;
-            return 0;
-        });
+            // return 0;
+        // });
     } else if (sortBySafe == 'last_published' || sortBySafe == 'release') {
         sorted = dependencies.sort((a: any, b: any) => {
             if (
