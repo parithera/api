@@ -19,11 +19,11 @@ import {
 } from 'src/types/error.types';
 import { ApiErrorDecorator } from 'src/decorators/ApiException';
 import { FileService } from './file.service';
-import { FileInterceptor, File } from '@nest-lab/fastify-multer';
 import { NoDataResponse, TypedResponse } from 'src/types/apiResponses.types';
 import { join } from 'path';
 import { readFile } from 'fs';
 import { escapeString } from 'src/utils/cleaner';
+import { FileInterceptor, MulterFile } from '@webundsoehne/nest-fastify-file-upload';
 
 export interface UploadData {
     type: string;
@@ -65,7 +65,7 @@ export class FileController {
         @Param('project_id') project_id: string,
         @Param('organization_id') organization_id: string,
         @Body() queryParams: UploadData,
-        @UploadedFile() file: File
+        @UploadedFile() file: MulterFile
     ): Promise<void> {
         // https://medium.com/@hackntosh/how-to-handle-file-uploading-with-nestjs-fastify-swagger-81afb08767ce
         if (!file) {

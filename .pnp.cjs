@@ -31,7 +31,6 @@ const RAW_RUNTIME_STATE =
           ["@fastify/compress", "npm:8.0.1"],\
           ["@fastify/multipart", "npm:9.0.3"],\
           ["@fastify/static", "npm:8.1.1"],\
-          ["@nest-lab/fastify-multer", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:1.3.0"],\
           ["@nestjs-modules/mailer", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:2.0.2"],\
           ["@nestjs/axios", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:4.0.0"],\
           ["@nestjs/cli", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:10.0.5"],\
@@ -70,6 +69,7 @@ const RAW_RUNTIME_STATE =
           ["@types/supertest", "npm:6.0.2"],\
           ["@types/uuid", "npm:10.0.0"],\
           ["@types/webcrypto", "npm:0.0.30"],\
+          ["@webundsoehne/nest-fastify-file-upload", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:2.3.1"],\
           ["amqplib", "npm:0.10.5"],\
           ["axios", "npm:1.8.3"],\
           ["bcrypt", "npm:5.1.1"],\
@@ -2021,37 +2021,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/@microsoft-tsdoc-npm-0.15.1-e24295d9bd-1a92612883.zip/node_modules/@microsoft/tsdoc/",\
         "packageDependencies": [\
           ["@microsoft/tsdoc", "npm:0.15.1"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["@nest-lab/fastify-multer", [\
-      ["npm:1.3.0", {\
-        "packageLocation": "./.yarn/cache/@nest-lab-fastify-multer-npm-1.3.0-c575fb2a8f-ad9a49c37d.zip/node_modules/@nest-lab/fastify-multer/",\
-        "packageDependencies": [\
-          ["@nest-lab/fastify-multer", "npm:1.3.0"]\
-        ],\
-        "linkType": "SOFT"\
-      }],\
-      ["virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:1.3.0", {\
-        "packageLocation": "./.yarn/__virtual__/@nest-lab-fastify-multer-virtual-86b4567542/0/cache/@nest-lab-fastify-multer-npm-1.3.0-c575fb2a8f-ad9a49c37d.zip/node_modules/@nest-lab/fastify-multer/",\
-        "packageDependencies": [\
-          ["@nest-lab/fastify-multer", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:1.3.0"],\
-          ["@nestjs/common", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:11.0.11"],\
-          ["@nestjs/platform-fastify", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:11.0.11"],\
-          ["@types/nestjs__common", null],\
-          ["@types/nestjs__platform-fastify", null],\
-          ["@types/rxjs", null],\
-          ["fastify-multer", "npm:2.0.3"],\
-          ["rxjs", "npm:7.8.2"]\
-        ],\
-        "packagePeers": [\
-          "@nestjs/common",\
-          "@nestjs/platform-fastify",\
-          "@types/nestjs__common",\
-          "@types/nestjs__platform-fastify",\
-          "@types/rxjs",\
-          "rxjs"\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4232,6 +4201,41 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@webundsoehne/nest-fastify-file-upload", [\
+      ["npm:2.3.1", {\
+        "packageLocation": "./.yarn/cache/@webundsoehne-nest-fastify-file-upload-npm-2.3.1-fe0572946a-4f9a866eb1.zip/node_modules/@webundsoehne/nest-fastify-file-upload/",\
+        "packageDependencies": [\
+          ["@webundsoehne/nest-fastify-file-upload", "npm:2.3.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:2.3.1", {\
+        "packageLocation": "./.yarn/__virtual__/@webundsoehne-nest-fastify-file-upload-virtual-1f86a96b69/0/cache/@webundsoehne-nest-fastify-file-upload-npm-2.3.1-fe0572946a-4f9a866eb1.zip/node_modules/@webundsoehne/nest-fastify-file-upload/",\
+        "packageDependencies": [\
+          ["@webundsoehne/nest-fastify-file-upload", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:2.3.1"],\
+          ["@fastify/multipart", "npm:9.0.3"],\
+          ["@nestjs/common", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:11.0.11"],\
+          ["@nestjs/core", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:11.0.11"],\
+          ["@nestjs/platform-fastify", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:11.0.11"],\
+          ["@types/fastify__multipart", null],\
+          ["@types/nestjs__common", null],\
+          ["@types/nestjs__core", null],\
+          ["@types/nestjs__platform-fastify", null],\
+          ["fastify-multer", "npm:2.0.3"]\
+        ],\
+        "packagePeers": [\
+          "@fastify/multipart",\
+          "@nestjs/common",\
+          "@nestjs/core",\
+          "@nestjs/platform-fastify",\
+          "@types/fastify__multipart",\
+          "@types/nestjs__common",\
+          "@types/nestjs__core",\
+          "@types/nestjs__platform-fastify"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@xtuc/ieee754", [\
       ["npm:1.2.0", {\
         "packageLocation": "./.yarn/cache/@xtuc-ieee754-npm-1.2.0-ec0ce4e025-ab033b0329.zip/node_modules/@xtuc/ieee754/",\
@@ -4653,7 +4657,6 @@ const RAW_RUNTIME_STATE =
           ["@fastify/compress", "npm:8.0.1"],\
           ["@fastify/multipart", "npm:9.0.3"],\
           ["@fastify/static", "npm:8.1.1"],\
-          ["@nest-lab/fastify-multer", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:1.3.0"],\
           ["@nestjs-modules/mailer", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:2.0.2"],\
           ["@nestjs/axios", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:4.0.0"],\
           ["@nestjs/cli", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:10.0.5"],\
@@ -4692,6 +4695,7 @@ const RAW_RUNTIME_STATE =
           ["@types/supertest", "npm:6.0.2"],\
           ["@types/uuid", "npm:10.0.0"],\
           ["@types/webcrypto", "npm:0.0.30"],\
+          ["@webundsoehne/nest-fastify-file-upload", "virtual:7473a2b7820d54bc9e09e43d07c4d6a37311d3c27cf8d3479124c02c830f39ea1edcd0240ea9cd8892e68b95c71dc40f3562d9221ee2fee4332c0f6b026a8253#npm:2.3.1"],\
           ["amqplib", "npm:0.10.5"],\
           ["axios", "npm:1.8.3"],\
           ["bcrypt", "npm:5.1.1"],\

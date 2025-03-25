@@ -73,7 +73,9 @@ function sort(
             return 0;
         });
     } else if (sortBySafe == 'combined_severity') {
-        sorted = dependencies.sort(()=> {return 0}) 
+        sorted = dependencies.sort(() => {
+            return 0;
+        });
         // sorted = dependencies.sort((a: SbomDependency, b: SbomDependency) => {
         //     // if ((a.combined_severity ?? 0.0) > (b.combined_severity ?? 0.0))
         //     //     return sortDirectionSafe == 'DESC' ? -1 : 1;

@@ -2,6 +2,7 @@
 import compression from '@fastify/compress';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import multipart from '@fastify/multipart';
 
 // Import the main application module
 import { AppModule } from './app.module';
@@ -21,7 +22,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
     // Create a new NestJS application instance using Fastify as the underlying server
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
-
+    app.register(multipart, {
+        limits: {
+            fileSize: 25 * 1024 * 1024 //25 MB
+        }
+    });
     /**
      * Add a polyfill to make Passport.js compatible with Fastify.
      * This is necessary because Fastify has a different API than Express.js.

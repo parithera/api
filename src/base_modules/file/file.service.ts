@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { File } from '@nest-lab/fastify-multer';
 import * as fs from 'fs';
 import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
 import { File as FileEntity } from 'src/base_modules/file/file.entity';
@@ -11,6 +10,7 @@ import { UsersRepository } from '../users/users.repository';
 import { OrganizationsRepository } from '../organizations/organizations.repository';
 import { ProjectsRepository } from '../projects/projects.repository';
 import { FileRepository } from './file.repository';
+import { MulterFile } from '@webundsoehne/nest-fastify-file-upload';
 
 @Injectable()
 export class FileService {
@@ -32,7 +32,7 @@ export class FileService {
      */
     async uploadFile(
         user: AuthenticatedUser,
-        file: File,
+        file: MulterFile,
         project_id: string,
         organization_id: string,
         queryParams: UploadData
