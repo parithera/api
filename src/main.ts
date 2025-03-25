@@ -24,9 +24,9 @@ async function bootstrap() {
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
     app.register(multipart, {
         limits: {
-          fileSize: 25 * 1024 * 1024, //25 MB
-        },
-      });
+            fileSize: 25 * 1024 * 1024 //25 MB
+        }
+    });
     /**
      * Add a polyfill to make Passport.js compatible with Fastify.
      * This is necessary because Fastify has a different API than Express.js.
