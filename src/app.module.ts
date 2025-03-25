@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { FastifyMulterModule } from '@nest-lab/fastify-multer';
 import { AuthModule } from './base_modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { validate } from './utils/validate-env';
@@ -35,8 +34,6 @@ export const defaultOptions: PostgresConnectionOptions = {
     imports: [
         // Module for handling authentication-related functionality.
         AuthModule,
-        // Module for handling file uploads using Fastify Multer.
-        FastifyMulterModule,
         // Module for managing application configuration, including environment variables and validation.
         ConfigModule.forRoot({
             validate,
