@@ -47,6 +47,7 @@ import {
     LinkGitlabPatchBody
 } from 'src/base_modules/integrations/gitlab/gitlabIntegration.types';
 import { Repository } from 'src/base_modules/integrations/integration.types';
+import { RepositoryCache } from 'src/base_modules/projects/repositoryCache.entity';
 
 @Controller('org/:org_id/integrations/gitlab')
 export class GitlabIntegrationController {
@@ -165,7 +166,7 @@ export class GitlabIntegrationController {
         @Query('active_filters') active_filters?: string,
         @Query('sort_key') sort_key?: string,
         @Query('sort_direction') sort_direction?: SortDirection
-    ): Promise<TypedPaginatedResponse<Repository>> {
+    ): Promise<TypedPaginatedResponse<RepositoryCache>> {
         return await this.gitlabReposService.getGitlabRepositories(
             org_id,
             integration_id,

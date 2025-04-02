@@ -11,10 +11,9 @@ import { PaginationConfig, PaginationUserSuppliedConf } from 'src/types/paginati
 import { CONST_VCS_INTEGRATION_CACHE_INVALIDATION_MINUTES } from './constants';
 import { GithubRepositorySchema } from 'src/base_modules/integrations/github/github.types';
 import { SortDirection } from 'src/types/sort.types';
-import ms = require('ms');
+import ms from 'ms';
 import { GithubIntegrationService } from './github.service';
 import { MemberRole } from 'src/base_modules/organizations/memberships/orgMembership.types';
-import { Integration } from 'src/base_modules/integrations/integrations.entity';
 import { RepositoryCache, RepositoryType } from 'src/base_modules/projects/repositoryCache.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -318,9 +317,8 @@ export class GithubRepositoriesService {
      * @param transaction A db transaction instance
      */
     private async saveRepos(repos: GithubRepositorySchema[], integrationId: string): Promise<void> {
+        const integration = await this.integrationsRepository.getIntegrationById(integrationId);
         for (const rawRepo of repos) {
-            const integration = await this.integrationsRepository.getIntegrationById(integrationId);
-
             const repository = new RepositoryCache();
             repository.repository_type = RepositoryType.GITHUB;
             repository.url = rawRepo.html_url;

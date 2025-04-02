@@ -1,13 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { TypedPaginatedResponse } from 'src/types/apiResponses.types';
 import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
-import { PaginationUserSuppliedConf } from 'src/types/pagination.types';
+import { PaginationConfig, PaginationUserSuppliedConf } from 'src/types/pagination.types';
 import { SortDirection } from 'src/types/sort.types';
-import { Repository } from 'src/base_modules/integrations/integration.types';
-import { RepositoryCache } from 'src/base_modules/projects/repositoryCache.entity';
+import { Repository } from 'typeorm';
+import { RepositoryCache, RepositoryType } from 'src/base_modules/projects/repositoryCache.entity';
+import { GitlabIntegrationService } from './gitlab.service';
+import { OrganizationsRepository } from 'src/base_modules/organizations/organizations.repository';
+import { IntegrationsRepository } from '../integrations.repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { MemberRole } from 'src/base_modules/organizations/memberships/organization.memberships.entity';
+import { NotAuthorized } from 'src/types/error.types';
+import ms from 'ms';
+import { CONST_VCS_INTEGRATION_CACHE_INVALIDATION_MINUTES } from '../github/constants';
 
 @Injectable()
 export class GitlabRepositoriesService {
+
+    constructor(
+        private readonly gitlabIntegrationService: GitlabIntegrationService,
+        private readonly organizationsRepository: OrganizationsRepository,
+        private readonly integrationsRepository: IntegrationsRepository,
+        @InjectRepository(RepositoryCache, 'codeclarity')
+        private repositoryCacheRepository: Repository<RepositoryCache>
+    ) { }
+
     /**
      * Sync updated and new repos from the integration
      * @throws {NotAuthorized} If the authenticated user is not authorized to perform this action
@@ -23,7 +40,56 @@ export class GitlabRepositoriesService {
      * @returns
      */
     async syncGitlabRepos(integrationId: string): Promise<void> {
-        throw new Error('Method not implemented.');
+        // Retrieve the access token to access gitlab from the integration
+        const gitlabToken = await this.gitlabIntegrationService.getToken(integrationId);
+        const rawToken = gitlabToken.getToken();
+
+        const integration = await this.integrationsRepository.getIntegrationById(integrationId);
+
+        const entriesPerPage = 100;
+
+        try {
+            const response = await fetch('https://gitlab.com/api/v4/projects?owned=true&membership=true&per_page=' + entriesPerPage, {
+                headers: {
+                    'PRIVATE-TOKEN': rawToken
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch repositories from GitLab. Status: ${response.status}`);
+            }
+
+            const projects = await response.json();
+
+            const integration = await this.integrationsRepository.getIntegrationById(integrationId);
+            // Process the projects and save them to the repository cache
+            for (const project of projects) {
+                const repo = await this.repositoryCacheRepository.existsBy({fully_qualified_name: project.name_with_namespace})
+                if (repo) continue
+
+                const repository = new RepositoryCache();
+                repository.repository_type = RepositoryType.GITLAB;
+                repository.url = project.http_url_to_repo;
+                repository.default_branch = project.default_branch;
+                repository.visibility = project.visibility ?? 'public';
+                repository.fully_qualified_name = project.name_with_namespace;
+                repository.description = project.description ?? '';
+                repository.created_at = project.created_at ?? new Date();
+                repository.integration = integration;
+    
+                await this.repositoryCacheRepository.save(repository);
+            }
+
+        } catch (error) {
+            console.error('Error syncing GitLab repositories:', error);
+            throw error;
+        }
+
+
+        // TODO Fetch repositories
+
+        integration.last_repository_sync = new Date();
+        await this.integrationsRepository.saveIntegration(integration);
     }
 
     /**
@@ -54,9 +120,122 @@ export class GitlabRepositoriesService {
         filters?: string[],
         sortBy?: string,
         sortDirection?: SortDirection
-    ): Promise<TypedPaginatedResponse<Repository>> {
-        throw new Error('Method not implemented.');
+    ): Promise<TypedPaginatedResponse<RepositoryCache>> {
+        enum AllowedOrderBy {
+            FULLY_QUALIFIED_NAME = 'fully_qualified_name',
+            DESCRIPTION = 'description',
+            CREATED = 'created_at',
+            IMPORTED = 'imported'
+        }
+
+        // (1) Check that the user has the right to access the org
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+
+        // (2) Check that the integration belongs to the org
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
+            throw new NotAuthorized();
+        }
+
+        const paginationConfig: PaginationConfig = {
+            maxEntriesPerPage: 100,
+            defaultEntriesPerPage: 20
+        };
+
+        let entriesPerPage = paginationConfig.defaultEntriesPerPage;
+        let currentPage = 0;
+
+        if (paginationUserSuppliedConf.entriesPerPage)
+            entriesPerPage = Math.min(
+                paginationConfig.maxEntriesPerPage,
+                paginationUserSuppliedConf.entriesPerPage
+            );
+
+        if (paginationUserSuppliedConf.currentPage)
+            currentPage = Math.max(0, paginationUserSuppliedConf.currentPage);
+
+
+        const isSynced = await this.areGitlabReposSynced(integrationId);
+
+        if (forceRefresh != undefined && forceRefresh == true) {
+            await this.syncGitlabRepos(integrationId)
+        } else {
+            if (!isSynced) {
+                await this.syncGitlabRepos(integrationId)
+            }
+        }
+
+        let repositoryQB = this.repositoryCacheRepository
+            .createQueryBuilder('repo')
+            .where('repo.integration = :integrationId', { integrationId });
+
+        if (sortBy) {
+            if (sortBy == AllowedOrderBy.FULLY_QUALIFIED_NAME)
+                repositoryQB = repositoryQB.orderBy('fully_qualified_name', sortDirection ?? 'ASC');
+            else if (sortBy == AllowedOrderBy.DESCRIPTION)
+                repositoryQB = repositoryQB.orderBy('description', sortDirection ?? 'ASC');
+            else if (sortBy == AllowedOrderBy.CREATED)
+                repositoryQB = repositoryQB.orderBy('created_at', sortDirection ?? 'ASC');
+            else if (sortBy == AllowedOrderBy.IMPORTED)
+                repositoryQB = repositoryQB.orderBy('imported_already', sortDirection ?? 'ASC');
+        }
+
+        if (searchKey) {
+            repositoryQB = repositoryQB.andWhere('repo.fully_qualified_name LIKE :searchValue', {
+                searchValue: `%${searchKey}%`
+            });
+        }
+
+        if (filters) {
+            // if (filters.includes('only_non_imported')) {
+            //     repositoryQB = repositoryQB.andWhere('repo.imported_already = :imported', {
+            //         imported: false
+            //     });
+            // }
+        }
+
+        const fullCount = await repositoryQB.getCount();
+
+        repositoryQB = repositoryQB.skip(currentPage * entriesPerPage).take(entriesPerPage);
+
+        const repositories = await repositoryQB.getMany();
+
+        // Return the paginated list of github repos for the integration
+        return {
+            data: repositories,
+            page: currentPage,
+            entry_count: repositories.length,
+            entries_per_page: entriesPerPage,
+            total_entries: fullCount,
+            total_pages: Math.ceil(fullCount / entriesPerPage),
+            matching_count: fullCount, // once you apply filters this needs to change
+            filter_count: {}
+        };
     }
+
+    /**
+         * Check if github repos have been synced
+         *
+         * @param integrationId The id of the integration
+         * @returns a boolean indicating whether the repos of the integration are synced
+         */
+        async areGitlabReposSynced(integrationId: string): Promise<boolean> {
+            const integration = await this.integrationsRepository.getIntegrationById(integrationId);
+    
+            const lastUpdated: Date | undefined = integration.last_repository_sync;
+    
+            if (!lastUpdated) return false;
+    
+            const invalidatedDate = new Date(
+                ms(`-${CONST_VCS_INTEGRATION_CACHE_INVALIDATION_MINUTES}m`)
+            );
+            if (lastUpdated <= invalidatedDate) {
+                return false;
+            }
+    
+            return true;
+        }
 
     /**
      * Get a specific gitlab repository from the integration id
