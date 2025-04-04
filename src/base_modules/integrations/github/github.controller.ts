@@ -46,8 +46,6 @@ import {
 } from 'src/base_modules/integrations/github/githubIntegration.types';
 import { Integration } from 'src/base_modules/integrations/integrations.entity';
 import { RepositoryCache } from 'src/base_modules/projects/repositoryCache.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { OrganizationsRepository } from 'src/base_modules/organizations/organizations.repository';
 import { IntegrationsRepository } from '../integrations.repository';
 

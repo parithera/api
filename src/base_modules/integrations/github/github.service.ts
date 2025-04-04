@@ -25,8 +25,6 @@ import {
     IntegrationType
 } from 'src/base_modules/integrations/integration.types';
 import { Integration } from 'src/base_modules/integrations/integrations.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { UsersRepository } from 'src/base_modules/users/users.repository';
 import { OrganizationsRepository } from 'src/base_modules/organizations/organizations.repository';
 import { IntegrationsRepository } from '../integrations.repository';
