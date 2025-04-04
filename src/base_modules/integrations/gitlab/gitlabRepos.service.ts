@@ -49,7 +49,7 @@ export class GitlabRepositoriesService {
         const entriesPerPage = 100;
 
         try {
-            const response = await fetch('https://gitlab.com/api/v4/projects?owned=true&membership=true&per_page=' + entriesPerPage, {
+            const response = await fetch(integration.service_domain+'/api/v4/projects?owned=true&membership=true&per_page=' + entriesPerPage, {
                 headers: {
                     'PRIVATE-TOKEN': rawToken
                 }
