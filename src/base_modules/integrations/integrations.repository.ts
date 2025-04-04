@@ -18,9 +18,10 @@ export class IntegrationsRepository {
      * @returns The Integration object if found.
      * @throws EntityNotFound - If no integration is found with the given ID.
      */
-    async getIntegrationById(integrationId: string): Promise<Integration> {
-        const integration = await this.integrationRepository.findOneBy({
-            id: integrationId
+    async getIntegrationById(integrationId: string, relations?: any): Promise<Integration> {
+        const integration = await this.integrationRepository.findOne({
+            where:{id: integrationId},
+            relations: relations
         });
 
         if (!integration) {

@@ -12,8 +12,8 @@ import { IntegrationsModule } from '../integrations.module';
 @Module({
     imports: [
         forwardRef(() => UsersModule),
-        OrganizationsModule,
         forwardRef(() => IntegrationsModule),
+        OrganizationsModule,
         TypeOrmModule.forFeature([RepositoryCache], 'codeclarity')
     ],
     exports: [GithubRepositoriesService],

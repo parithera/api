@@ -31,6 +31,10 @@ export class GitlabIntegration
 {
     @ApiProperty()
     @Expose()
+    id: string;
+
+    @ApiProperty()
+    @Expose()
     service_base_url: string;
 
     @ApiProperty()

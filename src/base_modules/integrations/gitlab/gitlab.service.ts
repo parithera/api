@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AuthenticatedUser } from 'src/base_modules/auth/auth.types';
-import { IntegrationsService } from '../integrations.service';
 import { GitlabIntegrationToken } from 'src/base_modules/integrations/Token';
-import { IntegrationWrongTokenType, NotAuthorized } from 'src/types/error.types';
+import { DuplicateIntegration, EntityNotFound, IntegrationInvalidToken, IntegrationTokenExpired, IntegrationTokenMissingPermissions, IntegrationTokenRefreshFailed, IntegrationTokenRetrievalFailed, IntegrationWrongTokenType, NotAMember, NotAuthorized } from 'src/types/error.types';
 import {
     GitlabIntegration,
     GitlabTokenType,
@@ -11,12 +10,22 @@ import {
 } from 'src/base_modules/integrations/gitlab/gitlabIntegration.types';
 import { MemberRole } from 'src/base_modules/organizations/memberships/orgMembership.types';
 import { OrganizationsRepository } from 'src/base_modules/organizations/organizations.repository';
+import { UsersRepository } from 'src/base_modules/users/users.repository';
+import { Integration, IntegrationProvider, IntegrationType } from '../integrations.entity';
+import { IntegrationsRepository } from '../integrations.repository';
+import { GitlabIntegrationTokenService } from './gitlabToken.service';
+import { VCSIntegrationMetaData } from '../integration.types';
 
 // https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#prefill-personal-access-token-name-and-scopes
 
 @Injectable()
 export class GitlabIntegrationService {
-    constructor(private readonly organizationsRepository: OrganizationsRepository) {}
+    constructor(
+        private readonly gitlabIntegrationTokenService: GitlabIntegrationTokenService,
+        private readonly organizationsRepository: OrganizationsRepository,
+        private readonly integrationsRepository: IntegrationsRepository,
+        private readonly usersRepository: UsersRepository,
+    ) { }
 
     /**
      *
@@ -41,9 +50,28 @@ export class GitlabIntegrationService {
 
         // (2) Check that the user has the right to access the org
         await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+        const integration = await this.integrationsRepository.getIntegrationById(integrationId, {
+            organizations: true,
+            owner: true
+        });
 
-        // return await this.gitlabRepo.get(integrationId);
-        throw new Error('Method not implemented.');
+        const gitlabIntegration = new GitlabIntegration()
+        gitlabIntegration.id = integration.id
+        gitlabIntegration.access_token = integration.access_token
+        gitlabIntegration.meta_data = new VCSIntegrationMetaData()
+        gitlabIntegration.added_on = integration.added_on
+        gitlabIntegration.added_by = integration.owner.id
+        gitlabIntegration.service_domain = integration.service_domain
+        gitlabIntegration.integration_type = integration.integration_type
+        gitlabIntegration.integration_provider = integration.integration_provider
+        gitlabIntegration.invalid = integration.invalid
+        gitlabIntegration.expiry_date = integration.expiry_date
+        gitlabIntegration.organization_id = integration.organizations[0].id
+        gitlabIntegration.refresh_token = integration.refresh_token
+        gitlabIntegration.service_base_url = integration.service_domain
+        gitlabIntegration.token_type = GitlabTokenType.PERSONAL_ACCESS_TOKEN
+
+        return gitlabIntegration
     }
 
     /**
@@ -82,7 +110,66 @@ export class GitlabIntegrationService {
         linkGitlabCreate: LinkGitlabCreateBody,
         user: AuthenticatedUser
     ): Promise<string> {
-        throw new Error('Method not implemented.');
+        if (linkGitlabCreate.token_type !== GitlabTokenType.PERSONAL_ACCESS_TOKEN) {
+            throw new IntegrationWrongTokenType();
+        }
+
+        const tokenType = this.getTokenTypeFromTokenString(linkGitlabCreate.token);
+        if (tokenType !== GitlabTokenType.PERSONAL_ACCESS_TOKEN) {
+            throw new IntegrationWrongTokenType();
+        }
+
+        const organization = await this.organizationsRepository.getOrganizationById(orgId, {
+            integrations: true
+        });
+        if (!organization) {
+            throw new EntityNotFound();
+        }
+
+        // Check if the organization already has a GitLab integration
+        if (
+            organization.integrations &&
+            organization.integrations.some(
+                (i) => i.integration_provider === IntegrationProvider.GITLAB
+            )
+        ) {
+            throw new DuplicateIntegration();
+        }
+
+        // const [expires, expiresAt] =
+        //     await this.gitlabIntegrationTokenService.getPersonalAccessTokenExpiryRemote(
+        //         linkGitlabCreate.token,
+        //         linkGitlabCreate.gitlab_instance_url
+        //     );
+        // await this.gitlabIntegrationTokenService.validatePersonalAccessTokenPermissions(
+        //     linkGitlabCreate.token,
+        //     linkGitlabCreate.gitlab_instance_url,
+        //     {}
+        // );
+
+        const owner = await this.usersRepository.getUserById(user.userId);
+
+        const integration: Integration = new Integration();
+        integration.integration_type = IntegrationType.VCS;
+        integration.integration_provider = IntegrationProvider.GITLAB;
+        integration.access_token = linkGitlabCreate.token;
+        integration.token_type = GitlabTokenType.PERSONAL_ACCESS_TOKEN;
+        integration.invalid = false;
+        integration.added_on = new Date();
+        integration.owner = owner;
+        integration.service_domain = linkGitlabCreate.gitlab_instance_url;
+        // if (expires && expiresAt) {
+        //     integration.expiry_date = expiresAt;
+        // }
+
+        integration.users = [owner];
+
+        const addedIntegration = await this.integrationsRepository.saveIntegration(integration);
+
+        organization.integrations?.push(addedIntegration);
+        await this.organizationsRepository.saveOrganization(organization);
+
+        return addedIntegration.id;
     }
 
     /**
@@ -133,7 +220,37 @@ export class GitlabIntegrationService {
      * @returns the gitlab token
      */
     async getToken(integrationId: string): Promise<GitlabIntegrationToken> {
-        throw new Error('Method not implemented.');
+        try {
+            const integration = await this.integrationsRepository.getIntegrationById(integrationId);
+            const token = new GitlabIntegrationToken(
+                this.gitlabIntegrationTokenService,
+                integrationId,
+                integration.access_token,
+                integration.token_type as GitlabTokenType,
+                integration.service_domain
+            );
+
+            await token.validate();
+
+            return token;
+        } catch (err) {
+            if (
+                err instanceof IntegrationTokenMissingPermissions ||
+                err instanceof IntegrationTokenExpired ||
+                err instanceof IntegrationInvalidToken ||
+                err instanceof IntegrationTokenRetrievalFailed ||
+                err instanceof IntegrationTokenRefreshFailed
+            ) {
+                // TODO: Implement marking the integration as invalid in the repository
+                throw err;
+            }
+
+            if (err instanceof NotAMember) {
+                throw new NotAuthorized();
+            }
+
+            throw err;
+        }
     }
 
     /**
