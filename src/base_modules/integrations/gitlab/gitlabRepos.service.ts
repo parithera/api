@@ -10,7 +10,7 @@ import { OrganizationsRepository } from 'src/base_modules/organizations/organiza
 import { IntegrationsRepository } from '../integrations.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MemberRole } from 'src/base_modules/organizations/memberships/organization.memberships.entity';
-import { NotAuthorized } from 'src/types/error.types';
+import { EntityNotFound, NotAuthorized } from 'src/types/error.types';
 import ms from 'ms';
 import { CONST_VCS_INTEGRATION_CACHE_INVALIDATION_MINUTES } from '../github/constants';
 
@@ -64,7 +64,7 @@ export class GitlabRepositoriesService {
             const integration = await this.integrationsRepository.getIntegrationById(integrationId);
             // Process the projects and save them to the repository cache
             for (const project of projects) {
-                const repo = await this.repositoryCacheRepository.existsBy({fully_qualified_name: project.name_with_namespace})
+                const repo = await this.repositoryCacheRepository.existsBy({ fully_qualified_name: project.name_with_namespace })
                 if (repo) continue
 
                 const repository = new RepositoryCache();
@@ -76,7 +76,7 @@ export class GitlabRepositoriesService {
                 repository.description = project.description ?? '';
                 repository.created_at = project.created_at ?? new Date();
                 repository.integration = integration;
-    
+
                 await this.repositoryCacheRepository.save(repository);
             }
 
@@ -220,22 +220,22 @@ export class GitlabRepositoriesService {
          * @param integrationId The id of the integration
          * @returns a boolean indicating whether the repos of the integration are synced
          */
-        async areGitlabReposSynced(integrationId: string): Promise<boolean> {
-            const integration = await this.integrationsRepository.getIntegrationById(integrationId);
-    
-            const lastUpdated: Date | undefined = integration.last_repository_sync;
-    
-            if (!lastUpdated) return false;
-    
-            const invalidatedDate = new Date(
-                ms(`-${CONST_VCS_INTEGRATION_CACHE_INVALIDATION_MINUTES}m`)
-            );
-            if (lastUpdated <= invalidatedDate) {
-                return false;
-            }
-    
-            return true;
+    async areGitlabReposSynced(integrationId: string): Promise<boolean> {
+        const integration = await this.integrationsRepository.getIntegrationById(integrationId);
+
+        const lastUpdated: Date | undefined = integration.last_repository_sync;
+
+        if (!lastUpdated) return false;
+
+        const invalidatedDate = new Date(
+            ms(`-${CONST_VCS_INTEGRATION_CACHE_INVALIDATION_MINUTES}m`)
+        );
+        if (lastUpdated <= invalidatedDate) {
+            return false;
         }
+
+        return true;
+    }
 
     /**
      * Get a specific gitlab repository from the integration id
@@ -261,6 +261,40 @@ export class GitlabRepositoriesService {
         user: AuthenticatedUser,
         forceRefresh?: boolean
     ): Promise<RepositoryCache> {
-        throw new Error('Method not implemented.');
+        // (1) Check that the user has the right to access the org
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+
+        // (2) Check that the integration belongs to the org
+        if (
+            !(await this.organizationsRepository.doesIntegrationBelongToOrg(integrationId, orgId))
+        ) {
+            throw new NotAuthorized();
+        }
+
+        const isSynced = await this.areGitlabReposSynced(integrationId);
+
+        if (forceRefresh != undefined && forceRefresh == true) {
+            await this.syncGitlabRepos(integrationId);
+        } else {
+            if (!isSynced) {
+                await this.syncGitlabRepos(integrationId);
+            }
+        }
+
+        const repo = await this.repositoryCacheRepository.findOne({
+            relations: ['integration'],
+            where: {
+                url: url,
+                integration: {
+                    id: integrationId
+                }
+            }
+        });
+
+        if (!repo) {
+            throw new EntityNotFound();
+        }
+
+        return repo;
     }
 }
