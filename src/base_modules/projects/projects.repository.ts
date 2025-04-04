@@ -98,7 +98,7 @@ export class ProjectsRepository {
             .leftJoin('project.organizations', 'organizations')
             .where('organizations.id = :orgId', { orgId: orgId })
             .leftJoinAndSelect('project.analyses', 'analyses')
-            .orderBy('analyses.created_on', 'DESC')
+            .orderBy('project.added_on', 'DESC')
             .leftJoinAndSelect('analyses.analyzer', 'analyzer')
             .leftJoinAndSelect('project.files', 'files')
             .leftJoinAndSelect('project.added_by', 'added_by');
