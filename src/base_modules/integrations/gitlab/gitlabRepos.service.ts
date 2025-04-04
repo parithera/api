@@ -61,7 +61,6 @@ export class GitlabRepositoriesService {
 
             const projects = await response.json();
 
-            const integration = await this.integrationsRepository.getIntegrationById(integrationId);
             // Process the projects and save them to the repository cache
             for (const project of projects) {
                 const repo = await this.repositoryCacheRepository.existsBy({ fully_qualified_name: project.name_with_namespace })
