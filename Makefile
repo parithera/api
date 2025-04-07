@@ -8,7 +8,7 @@ help: ## Outputs this help screen
 
 ## —— Docker 🐳 ————————————————————————————————————————————————————————————————
 build-prod: ## Builds de production Docker images
-	@docker build -f .cloud/docker/Dockerfile --tag codeclarityce/api:latest .
+	@docker build -f .cloud/docker/Dockerfile --tag parithera/api:latest .
 
 build: ## Builds the Docker images
 	@cd ../.cloud/scripts && sh build.sh api
