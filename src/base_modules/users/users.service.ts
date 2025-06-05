@@ -130,8 +130,8 @@ export class UsersService {
         user.password = passwordHash;
         user.social = false;
         user.setup_done = true;
-        user.activated = false;
-        user.registration_verified = false;
+        user.activated = true; // TODO reactivate once mail working
+        user.registration_verified = true;
         user.avatar_url = undefined;
         user.created_on = new Date();
         user.default_org = organization;
