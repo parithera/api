@@ -322,4 +322,45 @@ export class ProjectService {
             user.userId
         );
     }
+
+    /**
+     * Import a source code project
+     * @throws {IntegrationNotSupported}
+     * @throws {AlreadyExists}
+     * @throws {EntityNotFound}
+     * @throws {NotAuthorized}
+     *
+     * @param orgId The id of the organization
+     * @param projectData The project data
+     * @param user The authenticated user
+     * @returns the id of the created project
+     */
+    async update(
+        orgId: string,
+        projectId: string,
+        projectData: ProjectImportBody,
+        user: AuthenticatedUser
+    ): Promise<string> {
+        // (1) Check that the user is a member of the org
+        await this.organizationsRepository.hasRequiredRole(orgId, user.userId, MemberRole.USER);
+
+        const project = await this.projectsRepository.getProjectById(projectId);
+        if (!project) {
+            throw new EntityNotFound();
+        }
+
+        project.name = projectData.name;
+        project.description = projectData.description;
+
+        await this.projectsRepository.saveProject(project);
+
+        await this.organizationLoggerService.addAuditLog(
+            ActionType.ProjectCreate,
+            `The User update sample ${projectData.name} from the organization.`,
+            orgId,
+            user.userId
+        );
+
+        return projectId;
+    }
 }

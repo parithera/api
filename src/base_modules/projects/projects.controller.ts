@@ -7,7 +7,8 @@ import {
     Body,
     Query,
     DefaultValuePipe,
-    ParseIntPipe
+    ParseIntPipe,
+    Patch
 } from '@nestjs/common';
 import { AllowedOrderByGetProjects, ProjectService } from './projects.service';
 import {
@@ -114,5 +115,22 @@ export class ProjectController {
     ): Promise<NoDataResponse> {
         await this.projectsService.delete(org_id, project_id, user);
         return {};
+    }
+
+    @ApiTags('Samples')
+    @APIDocCreatedResponseDecorator()
+    @ApiErrorDecorator({ statusCode: 401, errors: [NotAuthenticated] })
+    @ApiErrorDecorator({ statusCode: 409, errors: [AlreadyExists] })
+    @ApiErrorDecorator({ statusCode: 404, errors: [EntityNotFound] })
+    @ApiErrorDecorator({ statusCode: 403, errors: [NotAuthorized] })
+    @ApiErrorDecorator({ statusCode: 500, errors: [InternalError] })
+    @Patch(':project_id')
+    async update(
+        @Body() project: ProjectImportBody,
+        @AuthUser() user: AuthenticatedUser,
+        @Param('org_id') org_id: string,
+        @Param('project_id') project_id: string
+    ): Promise<CreatedResponse> {
+        return { id: await this.projectsService.update(org_id, project_id, project, user) };
     }
 }
