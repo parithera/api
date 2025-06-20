@@ -29,8 +29,13 @@ jobs:
         id: extract_branch
 
       - name: Start Analysis
+        id: codeclarity-action
         uses: CodeClarityCE/codeclarity-action@v0
         with:
           branch: ${{ steps.extract_branch.outputs.branch }}
           projectName: ${{ github.repository }}
           analyzerName: 'JS Analyser'
+      
+      - name: Print Output
+        id: output
+        run: echo "${{ steps.codeclarity-action.outputs.vulnerabilities }}"
