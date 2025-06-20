@@ -21,9 +21,16 @@ jobs:
       DOMAIN: ${{ secrets.CODECLARITY_DOMAIN }}
 
     steps:
+      - name: Extract branch name
+        shell: bash
+        run:
+          echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >>
+          $GITHUB_OUTPUT
+        id: extract_branch
+
       - name: Start Analysis
         uses: CodeClarityCE/codeclarity-action@v0
         with:
-          branch: 'main'
-          projectName: 'parithera/api'
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          projectName: ${{ github.repository }}
           analyzerName: 'JS Analyser'
