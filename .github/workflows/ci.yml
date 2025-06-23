@@ -8,9 +8,6 @@ on:
     branches:
       - main
 
-# permissions:
-#   contents: read
-
 jobs:
   codeclarity-action:
     name: CodeClarity Actions
@@ -21,20 +18,23 @@ jobs:
       DOMAIN: ${{ secrets.CODECLARITY_DOMAIN }}
 
     steps:
-      - name: Extract branch name
-        shell: bash
-        run:
-          echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >>
-          $GITHUB_OUTPUT
-        id: extract_branch
+      - name: Get branch names.
+        id: branch-names
+        uses: tj-actions/branch-names@v8
 
       - name: Start Analysis
         id: codeclarity-action
         uses: CodeClarityCE/codeclarity-action@v0
         with:
-          branch: ${{ steps.extract_branch.outputs.branch }}
+          branch: ${{ steps.branch-names.outputs.current_branch }}
+          serverUrl: ${{ github.server_url }}
           projectName: ${{ github.repository }}
           analyzerName: 'JS Analyser'
+          failOnCritical: false
+          failOnHigh: false
+          failOnMedium: false
+          failOnLow: false
+          failOnInfo: false
       
       - name: Print Output
         id: output
